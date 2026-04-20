@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Food HUD">
+  <title>Food HUD</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%B2%3C/text%3E%3C/svg%3E">
+  <style>
+    html, body { margin: 0; padding: 0; background: #0a0a0f; overscroll-behavior: none; }
+    body { font-family: ui-monospace, monospace; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+  <script type="text/babel" data-type="module">
+    const { useState, useEffect, useMemo } = React;
+
+    const TODAY_DATE = { year: 2026, month: 3, day: 20 };
+    const TODAY_LOG = [
+      {
+        time: "11:30 AM",
+        name: "8 eggs + cheddar + olive oil + salsa",
+        p: 60, f: 50, c: 5, cal: 700, fib: 1,
+        note: "Breakfast — protein-zero breakfast pattern killed",
+      },
+    ];
+    const LAST_UPDATED = "12:43 PM";
+
+    const NEXT_FUEL = {
+      time: "2:00 PM",
+      item: "Premier Protein shake + handful of almonds",
+      rationale: "Pre-run liquid · clears 2+ hrs before 4:30 PM run",
+    };
+
+    const TARGETS = { protein: 195, carbs: 132, fat: 89, cal: 2000, fiber: 30 };
+    const DOW_FULL = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const MON_FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const DOW_SHORT = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const MON_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    function FoodHUD() {
+      const [now, setNow] = useState(Date.now());
+      const [closedOut, setClosedOut] = useState(false);
+      const [fallbackText, setFallbackText] = useState(null);
+
+      useEffect(() => {
+        const id = setInterval(() => setNow(Date.now()), 30000);
+        return () => clearInterval(id);
+      }, []);
+
+      const nowD = new Date(now);
+      const dow = nowD.getDay();
+      const dateStr = `${DOW_SHORT[dow]} ${MON_SHORT[nowD.getMonth()]} ${nowD.getDate()}`;
+      const past6PM = nowD.getHours() >= 18;
+      const isSun = dow === 0, isSat = dow === 6, isTue = dow === 2;
+      const isWE = isSun || isSat;
+
+      const totals = useMemo(() => TODAY_LOG.reduce((a, e) => ({
+        p: a.p + (+e.p || 0), f: a.f + (+e.f || 0), c: a.c + (+e.c || 0),
+        cal: a.cal + (+e.cal || 0), fib: a.fib + (+e.fib || 0),
+      }), { p: 0, f: 0, c: 0, cal: 0, fib: 0 }), []);
+
+      const parseTimeStr = (timeStr) => {
+        const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!match) return null;
+        let [_, h, m, ap] = match;
+        h = parseInt(h); m = parseInt(m);
+        if (ap.toUpperCase() === "PM" && h !== 12) h += 12;
+        if (ap.toUpperCase() === "AM" && h === 12) h = 0;
+        const d = new Date(TODAY_DATE.year, TODAY_DATE.month, TODAY_DATE.day, h, m);
+        return d.getTime();
+      };
+
+      const lastMealTs = TODAY_LOG.length ? parseTimeStr(TODAY_LOG[TODAY_LOG.length - 1].time) : null;
+      const gapMin = lastMealTs ? Math.floor((now - lastMealTs) / 60000) : null;
+      const gapH = gapMin !== null ? Math.floor(gapMin / 60) : null;
+      const gapM = gapMin !== null ? gapMin % 60 : null;
+      const gapColor = gapMin === null ? "#6b6b76" : gapMin >= 240 ? "#ff5a5a" : gapMin >= 180 ? "#f7d94e" : "#3dcf7a";
+
+      const nextFuelTs = NEXT_FUEL ? parseTimeStr(NEXT_FUEL.time) : null;
+      const nextMin = nextFuelTs ? Math.floor((nextFuelTs - now) / 60000) : null;
+      const nextH = nextMin !== null ? Math.floor(Math.abs(nextMin) / 60) : null;
+      const nextM = nextMin !== null ? Math.abs(nextMin) % 60 : null;
+      const nextIsPast = nextMin !== null && nextMin < 0;
+      const nextIsClose = nextMin !== null && nextMin >= 0 && nextMin <= 30;
+
+      const pct = (v, t) => Math.min(100, Math.round((v / t) * 100));
+      const color = (v, t, inverse = false) => {
+        const r = v / t;
+        if (inverse) {
+          if (r > 1.15) return "#ff5a5a";
+          if (r > 0.95) return "#f7d94e";
+          return "#3dcf7a";
+        }
+        if (r >= 0.95) return "#3dcf7a";
+        if (r >= 0.70) return "#f7d94e";
+        if (r >= 0.40) return "#EF9F27";
+        return "#ff5a5a";
+      };
+
+      const closeOut = async () => {
+        const head = `## ${DOW_FULL[dow].toUpperCase()} ${MON_FULL[nowD.getMonth()]} ${nowD.getDate()}, ${nowD.getFullYear()}\n`;
+        const th = `| Time | Food | Protein | Fat | Carbs | Cals | Fiber | Notes |\n|:-----|:-----|-------:|----:|------:|-----:|------:|:------|\n`;
+        const rows = TODAY_LOG.map(e =>
+          `| ${e.time} | ${e.name} | ${e.p}g | ${e.f}g | ${e.c}g | ${e.cal} | ${e.fib || 0} | ${e.note || ""} |`
+        ).join("\n");
+        const tot = `\n| **TOTAL** | | **${totals.p}g** | **${totals.f}g** | **${totals.c}g** | **${totals.cal}** | **${totals.fib}** | |`;
+        const pctRow = `| **% TARGET** | | **${Math.round((totals.p/TARGETS.protein)*100)}%** | **${Math.round((totals.f/TARGETS.fat)*100)}%** | **${Math.round((totals.c/TARGETS.carbs)*100)}%** | **${Math.round((totals.cal/TARGETS.cal)*100)}%** | **${Math.round((totals.fib/TARGETS.fiber)*100)}%** | |`;
+        const txt = head + "\n" + th + rows + tot + "\n" + pctRow + "\n";
+
+        try {
+          if (navigator.share) {
+            await navigator.share({ text: txt });
+            setClosedOut(true);
+            setTimeout(() => setClosedOut(false), 4000);
+            return;
+          }
+        } catch {}
+
+        try {
+          await navigator.clipboard.writeText(txt);
+          setClosedOut(true);
+          setTimeout(() => setClosedOut(false), 4000);
+        } catch {
+          setFallbackText(txt);
+        }
+      };
+
+      const proteinPct = pct(totals.p, TARGETS.protein);
+      const proteinColor = color(totals.p, TARGETS.protein);
+
+      return (
+        <div className="fh">
+          <div className="fh-header">
+            <div className="fh-title">Food Hud</div>
+            <div className="fh-date-stack">
+              <div className="fh-date">{dateStr}</div>
+              <div className="fh-flags">
+                {isSun && <span className="fh-flag rest">REST</span>}
+                {isSat && <span className="fh-flag church">CHURCH 5PM</span>}
+                {isTue && <span className="fh-flag resort">RESORT NIGHT</span>}
+                {isWE && <span className="fh-flag undat"> UNDAT HOME</span>}
+              </div>
+            </div>
+          </div>
+
+          <div className="fh-updated">
+            <span className="fh-updated-dot"></span>
+            Claude-tracked · last update {LAST_UPDATED}
+          </div>
+
+          {past6PM && (
+            <div className="fh-warn">6 PM CARB CUTOFF · protein + fat only · late carbs = zero N3</div>
+          )}
+
+          <div className="fh-hero">
+            <div className="fh-hero-label">Protein · Primary Target</div>
+            <div className="fh-hero-sub">The only number that matters</div>
+            <div className="fh-hero-num">
+              <div>
+                <span className="fh-big">{totals.p}</span>
+                <span className="fh-big-suffix">g</span>
+              </div>
+              <div className="fh-target-wrap">
+                <span className="fh-pct" style={{color:proteinColor}}>{proteinPct}%</span>
+                <div className="fh-target">of {TARGETS.protein}g</div>
+              </div>
+            </div>
+            <div className="fh-bar-bg">
+              <div className="fh-bar-fill" style={{width:proteinPct+"%",background:proteinColor,color:proteinColor}}/>
+            </div>
+            <div className="fh-hero-foot">
+              {totals.p >= TARGETS.protein
+                ? <React.Fragment><strong>FLOOR HIT.</strong> Every gram past this is bonus.</React.Fragment>
+                : <React.Fragment><strong>{TARGETS.protein - totals.p}g</strong> to the non-negotiable floor.</React.Fragment>}
+            </div>
+          </div>
+
+          <div className="fh-macros">
+            <div className="fh-m">
+              <div className="fh-m-val" style={{color:color(totals.cal,TARGETS.cal)}}>{totals.cal}</div>
+              <div className="fh-m-lbl">Cal<div className="fh-m-tgt">{TARGETS.cal}</div></div>
+            </div>
+            <div className="fh-m">
+              <div className="fh-m-val" style={{color:color(totals.c,TARGETS.carbs,true)}}>{totals.c}g</div>
+              <div className="fh-m-lbl">Carbs<div className="fh-m-tgt">{TARGETS.carbs}g</div></div>
+            </div>
+            <div className="fh-m">
+              <div className="fh-m-val" style={{color:color(totals.f,TARGETS.fat,true)}}>{totals.f}g</div>
+              <div className="fh-m-lbl">Fat<div className="fh-m-tgt">{TARGETS.fat}g</div></div>
+            </div>
+            <div className="fh-m">
+              <div className="fh-m-val" style={{color:color(totals.fib,TARGETS.fiber)}}>{totals.fib}g</div>
+              <div className="fh-m-lbl">Fiber<div className="fh-m-tgt">{TARGETS.fiber}g</div></div>
+            </div>
+          </div>
+
+          <div className="fh-guards">
+            <div className="fh-g">
+              <div className="fh-g-lbl">Last Meal</div>
+              <div className="fh-g-val" style={{color:gapColor}}>
+                {TODAY_LOG.length ? TODAY_LOG[TODAY_LOG.length - 1].time : "—"}
+              </div>
+              <div className="fh-g-sub">
+                {gapMin === null ? "Nothing logged yet"
+                  : gapMin < 0 ? "Upcoming"
+                  : gapMin >= 240 ? `${gapH}h ${gapM}m · gap exceeded`
+                  : gapMin >= 180 ? `${gapH}h ${gapM}m · closing on 4h`
+                  : `${gapH}h ${gapM}m ago`}
+              </div>
+            </div>
+            <div className="fh-g">
+              <div className="fh-g-lbl">Carb Window</div>
+              <div className="fh-g-val" style={{color:past6PM?"#ff5a5a":"#3dcf7a"}}>
+                {past6PM ? "Closed" : "Open"}
+              </div>
+              <div className="fh-g-sub">
+                {past6PM ? "Protein + fat only" : "Cutoff at 6:00 PM"}
+              </div>
+            </div>
+          </div>
+
+          {NEXT_FUEL && (
+            <div className={`fh-next${nextIsPast ? " past" : nextIsClose ? " close" : ""}`}>
+              <div className="fh-next-label">Next Fuel</div>
+              <div className="fh-next-body">
+                <div className="fh-next-time">{NEXT_FUEL.time}</div>
+                <div className="fh-next-item">{NEXT_FUEL.item}</div>
+                <div className="fh-next-countdown">
+                  {nextIsPast
+                    ? `${nextH}h ${nextM}m overdue`
+                    : nextMin < 60
+                      ? `in ${nextM}m`
+                      : `in ${nextH}h ${nextM}m`}
+                </div>
+              </div>
+              <div className="fh-next-why">{NEXT_FUEL.rationale}</div>
+            </div>
+          )}
+
+          <div className="fh-log">
+            <h3>
+              Today's Log
+              <span className="fh-log-count">{TODAY_LOG.length} {TODAY_LOG.length === 1 ? "entry" : "entries"}</span>
+            </h3>
+            {TODAY_LOG.length === 0 ? (
+              <div className="fh-empty">Nothing yet. Send Claude a food photo to start.</div>
+            ) : (
+              TODAY_LOG.map((e, i) => (
+                <div key={i} className="fh-entry">
+                  <span className="fh-e-time">{e.time}</span>
+                  <div className="fh-e-body">
+                    <div className="fh-e-name">{e.name}</div>
+                    {e.note && <div className="fh-e-note">{e.note}</div>}
+                  </div>
+                  <div className="fh-e-macro">
+                    {e.p}g<br/>
+                    <span className="fh-e-cal">{e.cal} cal</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <button
+            className={`fh-close${closedOut ? " done" : ""}`}
+            onClick={closeOut}
+            disabled={TODAY_LOG.length === 0}
+          >
+            {closedOut ? "COPIED ✓ PASTE TO CLAUDE" : "CLOSE OUT DAY"}
+          </button>
+
+          {fallbackText && (
+            <div className="fh-modal" onClick={()=>setFallbackText(null)}>
+              <div className="fh-mbox" onClick={e=>e.stopPropagation()}>
+                <div className="fh-mhandle"></div>
+                <div className="fh-mtitle">Send to Claude</div>
+                <div className="fh-msub">Clipboard blocked · select all + copy manually</div>
+                <textarea className="fh-mtxt" value={fallbackText} readOnly onFocus={e=>e.target.select()} />
+                <div className="fh-mbtns">
+                  <button className="fh-mcancel" onClick={()=>setFallbackText(null)}>DONE</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<FoodHUD />);
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; overscroll-behavior: none; }
+    button { touch-action: manipulation; font: inherit; }
+
+    .fh {
+      background:
+        radial-gradient(circle at 15% -5%, rgba(212,175,55,0.1), transparent 55%),
+        radial-gradient(circle at 85% 105%, rgba(91,155,245,0.06), transparent 50%),
+        #0a0a0f;
+      color: #e8e8ec;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding:
+        calc(16px + env(safe-area-inset-top))
+        calc(12px + env(safe-area-inset-right))
+        calc(28px + env(safe-area-inset-bottom))
+        calc(12px + env(safe-area-inset-left));
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      max-width: 560px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .fh::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+      opacity: 0.5;
+    }
+
+    .fh-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; padding-bottom: 14px;
+      border-bottom: 1px solid rgba(212,175,55,0.15);
+    }
+    .fh-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(24px, 7vw, 30px);
+      font-weight: 900; letter-spacing: -0.8px;
+      font-style: italic;
+      background: linear-gradient(135deg, #F4D47F 10%, #D4AF37 50%, #9A7D21);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .fh-date-stack { text-align: right; line-height: 1.4; }
+    .fh-date { font-size: 11px; color: #b0b0bc; letter-spacing: 1.3px; text-transform: uppercase; font-weight: 700; }
+    .fh-flags { font-size: 9px; margin-top: 3px; letter-spacing: 1px; }
+    .fh-flag.rest { color: #A78BFA; }
+    .fh-flag.church { color: #F472B6; }
+    .fh-flag.undat { color: #5B9BF5; }
+    .fh-flag.resort { color: #f7d94e; }
+
+    .fh-updated {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px;
+      font-size: 9px; color: #7a7a85; letter-spacing: 1.2px;
+      text-transform: uppercase; font-weight: 600;
+      padding: 8px 0;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .fh-updated-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #3dcf7a;
+      box-shadow: 0 0 8px #3dcf7a;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .fh-warn {
+      background: linear-gradient(90deg, rgba(255,90,90,0.2), rgba(255,90,90,0.04));
+      border: 1px solid rgba(255,90,90,0.5);
+      border-left: 3px solid #ff5a5a;
+      border-radius: 8px; padding: 11px 14px; margin-bottom: 14px;
+      font-size: 11px; color: #ff8f8f; font-weight: 700;
+      letter-spacing: 0.5px; line-height: 1.4;
+    }
+
+    .fh-hero {
+      background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(20,20,27,0.95));
+      border: 1px solid rgba(212,175,55,0.28);
+      border-radius: 16px;
+      padding: 20px 18px;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fh-hero::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #D4AF37 50%, transparent);
+    }
+    .fh-hero-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #b8932a; font-weight: 700; margin-bottom: 2px; }
+    .fh-hero-sub { font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: #8a8a95; margin-bottom: 14px; font-weight: 400; }
+    .fh-hero-num { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .fh-big {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(54px, 18vw, 80px);
+      font-weight: 900; line-height: 0.82;
+      letter-spacing: -3px;
+      background: linear-gradient(135deg, #F4D47F 0%, #D4AF37 55%, #A3811F);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-feature-settings: 'tnum';
+    }
+    .fh-big-suffix { font-family: 'Fraunces', serif; font-size: clamp(22px, 7vw, 30px); font-weight: 400; color: #D4AF37; margin-left: 2px; }
+    .fh-target-wrap { text-align: right; padding-bottom: 4px; flex-shrink: 0; }
+    .fh-pct { font-family: 'Fraunces', serif; font-size: clamp(22px, 6.5vw, 28px); font-weight: 800; display: block; line-height: 1; }
+    .fh-target { font-size: 10px; color: #7a7a85; letter-spacing: 0.8px; margin-top: 4px; }
+    .fh-bar-bg { height: 7px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+    .fh-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 12px currentColor; }
+    .fh-hero-foot { font-size: 11px; color: #8a8a95; letter-spacing: 0.3px; }
+    .fh-hero-foot strong { color: #D4AF37; font-weight: 700; }
+
+    .fh-macros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
+    .fh-m {
+      background: #14141b;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; padding: 11px 4px;
+      text-align: center;
+      min-height: 60px;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .fh-m-val { font-family: 'Fraunces', serif; font-size: clamp(16px, 4.8vw, 20px); font-weight: 800; letter-spacing: -0.5px; line-height: 1; }
+    .fh-m-lbl { font-size: 9px; color: #7a7a85; letter-spacing: 0.8px; text-transform: uppercase; margin-top: 5px; font-weight: 700; }
+    .fh-m-tgt { color: #4a4a54; font-size: 8px; font-weight: 500; }
+
+    .fh-guards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .fh-g { background: #14141b; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 11px 13px; }
+    .fh-g-lbl { font-size: 9px; color: #7a7a85; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+    .fh-g-val { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.1; }
+    .fh-g-sub { font-size: 10px; color: #8a8a95; margin-top: 4px; letter-spacing: 0.2px; line-height: 1.3; }
+
+    .fh-next {
+      background: linear-gradient(135deg, rgba(91,155,245,0.08), rgba(20,20,27,0.95));
+      border: 1px solid rgba(91,155,245,0.3);
+      border-left: 3px solid #5B9BF5;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .fh-next.close {
+      background: linear-gradient(135deg, rgba(247,217,78,0.1), rgba(20,20,27,0.95));
+      border-color: rgba(247,217,78,0.4);
+      border-left-color: #f7d94e;
+    }
+    .fh-next.past {
+      background: linear-gradient(135deg, rgba(255,90,90,0.12), rgba(20,20,27,0.95));
+      border-color: rgba(255,90,90,0.5);
+      border-left-color: #ff5a5a;
+      animation: pulseBorder 2s infinite;
+    }
+    @keyframes pulseBorder { 0%, 100% { box-shadow: 0 0 0 rgba(255,90,90,0); } 50% { box-shadow: 0 0 12px rgba(255,90,90,0.3); } }
+    .fh-next-label { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #5B9BF5; font-weight: 700; margin-bottom: 6px; }
+    .fh-next.close .fh-next-label { color: #f7d94e; }
+    .fh-next.past .fh-next-label { color: #ff5a5a; }
+    .fh-next-body { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+    .fh-next-time { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 800; color: #e8e8ec; letter-spacing: -0.5px; line-height: 1; }
+    .fh-next-item { font-size: 12px; color: #c0c0cc; font-weight: 500; flex: 1; }
+    .fh-next-countdown { font-size: 10px; color: #7a7a85; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+    .fh-next.past .fh-next-countdown { color: #ff5a5a; }
+    .fh-next-why { font-family: 'Fraunces', serif; font-style: italic; font-size: 11px; color: #7a7a85; margin-top: 4px; line-height: 1.3; }
+
+    .fh-log { background: #14141b; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .fh-log h3 { font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; font-weight: 700; color: #e8e8ec; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: -0.3px; }
+    .fh-log-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7a7a85; letter-spacing: 1.2px; text-transform: uppercase; font-style: normal; font-weight: 700; }
+    .fh-empty { text-align: center; padding: 28px 16px; color: #4a4a54; font-size: 13px; font-family: 'Fraunces', serif; font-style: italic; letter-spacing: 0.2px; }
+    .fh-entry { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 12px 2px; border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 44px; }
+    .fh-entry:last-child { border-bottom: none; padding-bottom: 4px; }
+    .fh-entry:first-child { padding-top: 4px; }
+    .fh-e-time { font-size: 10px; color: #8a8a95; letter-spacing: 0.3px; min-width: 62px; font-weight: 600; }
+    .fh-e-body { overflow: hidden; }
+    .fh-e-name { font-size: 13px; color: #e8e8ec; font-weight: 500; line-height: 1.3; overflow-wrap: break-word; }
+    .fh-e-note { font-size: 10px; color: #6b6b76; font-style: italic; margin-top: 3px; letter-spacing: 0.2px; line-height: 1.3; }
+    .fh-e-macro { font-size: 12px; color: #D4AF37; font-weight: 700; text-align: right; letter-spacing: 0.2px; line-height: 1.3; }
+    .fh-e-cal { font-size: 9px; color: #7a7a85; font-weight: 500; }
+
+    .fh-close {
+      width: 100%;
+      background: linear-gradient(135deg, #D4AF37, #b8932a);
+      color: #0a0a0f; border: none;
+      min-height: 60px; padding: 0 16px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; font-weight: 800;
+      letter-spacing: 2.2px; cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: 0 2px 12px rgba(212,175,55,0.28);
+    }
+    .fh-close:active:not(:disabled) { transform: scale(0.98); box-shadow: 0 1px 6px rgba(212,175,55,0.22); }
+    .fh-close:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+    .fh-close.done {
+      background: linear-gradient(135deg, #3dcf7a, #2ba85f);
+      color: #0a0a0f;
+      box-shadow: 0 2px 14px rgba(61,207,122,0.4);
+      animation: pulseGreen 0.6s ease-out;
+    }
+    @keyframes pulseGreen { 0% { transform: scale(1); } 40% { transform: scale(1.02); } 100% { transform: scale(1); } }
+
+    .fh-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(8px); display: flex; align-items: flex-end; justify-content: center; padding: 0; z-index: 100; animation: fadeIn 0.2s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .fh-mbox {
+      background: #14141b;
+      border-top: 2px solid rgba(212,175,55,0.5);
+      border-left: 1px solid rgba(212,175,55,0.2);
+      border-right: 1px solid rgba(212,175,55,0.2);
+      border-radius: 20px 20px 0 0;
+      padding: 22px 18px calc(22px + env(safe-area-inset-bottom));
+      width: 100%;
+      max-width: 560px;
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 -20px 60px rgba(0,0,0,0.6);
+    }
+    .fh-mhandle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: -8px auto 14px; }
+    .fh-mtitle { font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D4AF37; margin-bottom: 2px; font-weight: 700; letter-spacing: -0.3px; }
+    .fh-msub { font-size: 10px; color: #8a8a95; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 14px; font-weight: 600; line-height: 1.4; }
+    .fh-mtxt { width: 100%; flex: 1; min-height: 200px; background: #0a0a0f; border: 1px solid rgba(255,255,255,0.08); color: #e8e8ec; font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 12px; border-radius: 10px; resize: none; line-height: 1.5; -webkit-appearance: none; }
+    .fh-mbtns { display: flex; gap: 8px; margin-top: 12px; }
+    .fh-mcancel { flex: 1; background: transparent; color: #8a8a95; border: 1px solid rgba(255,255,255,0.12); min-height: 52px; padding: 0 20px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; font-weight: 700; cursor: pointer; }
+  </style>
+</body>
+</html>
