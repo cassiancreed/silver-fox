@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <title>Food HUD</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0a0a0f">
   <meta name="background-color" content="#0a0a0f">
@@ -14,9 +13,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Food HUD">
   <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,7 +26,7 @@
     .loading { display: flex; align-items: center; justify-content: center; min-height: 100vh; color: #D4AF37; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 24px; }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    button { touch-action: manipulation; font: inherit; }
+    button { touch-action: manipulation; font: inherit; cursor: pointer; }
 
     .fh {
       background:
@@ -51,16 +49,7 @@
     .fh::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #D4AF37, transparent); opacity: 0.5; }
 
     .fh-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(212,175,55,0.15); }
-    .fh-title {
-      font-family: 'Fraunces', Georgia, serif;
-      font-size: clamp(24px, 7vw, 30px);
-      font-weight: 900; letter-spacing: -0.8px;
-      font-style: italic;
-      background: linear-gradient(135deg, #F4D47F 10%, #D4AF37 50%, #9A7D21);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-    }
+    .fh-title { font-family: 'Fraunces', Georgia, serif; font-size: clamp(24px, 7vw, 30px); font-weight: 900; letter-spacing: -0.8px; font-style: italic; background: linear-gradient(135deg, #F4D47F 10%, #D4AF37 50%, #9A7D21); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; }
     .fh-date-stack { text-align: right; line-height: 1.4; }
     .fh-date { font-size: 11px; color: #b0b0bc; letter-spacing: 1.3px; text-transform: uppercase; font-weight: 700; }
     .fh-flags { font-size: 9px; margin-top: 3px; letter-spacing: 1px; }
@@ -73,6 +62,55 @@
     .fh-updated-dot { width: 6px; height: 6px; border-radius: 50%; background: #3dcf7a; box-shadow: 0 0 8px #3dcf7a; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+    /* CAMERA / LOG A MEAL button — prominent, above hero */
+    .fh-camera {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(20,20,27,0.95));
+      border: 1.5px solid rgba(212,175,55,0.5);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      color: #e8e8ec;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 14px;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .fh-camera::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #D4AF37 50%, transparent); }
+    .fh-camera:active { transform: scale(0.98); background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(20,20,27,1)); }
+    .fh-camera-icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 800;
+      color: #D4AF37;
+      letter-spacing: -1px;
+      min-width: 40px;
+      text-align: center;
+    }
+    .fh-camera-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2.2px;
+      color: #D4AF37;
+      flex: 1;
+      text-align: left;
+    }
+    .fh-camera-hint {
+      font-family: 'Fraunces', Georgia, serif;
+      font-style: italic;
+      font-size: 10px;
+      color: #8a8a95;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .fh-flash { border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 11px; letter-spacing: 0.3px; line-height: 1.4; font-weight: 600; }
+    .fh-flash.error { background: rgba(255,90,90,0.12); border: 1px solid rgba(255,90,90,0.5); color: #ff8f8f; }
+
     .fh-warn { background: linear-gradient(90deg, rgba(255,90,90,0.2), rgba(255,90,90,0.04)); border: 1px solid rgba(255,90,90,0.5); border-left: 3px solid #ff5a5a; border-radius: 8px; padding: 11px 14px; margin-bottom: 14px; font-size: 11px; color: #ff8f8f; font-weight: 700; letter-spacing: 0.5px; line-height: 1.4; }
 
     .fh-hero { background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(20,20,27,0.95)); border: 1px solid rgba(212,175,55,0.28); border-radius: 16px; padding: 20px 18px; margin-bottom: 10px; position: relative; overflow: hidden; }
@@ -80,16 +118,7 @@
     .fh-hero-label { font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: #b8932a; font-weight: 700; margin-bottom: 2px; }
     .fh-hero-sub { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 12px; color: #8a8a95; margin-bottom: 14px; font-weight: 400; }
     .fh-hero-num { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
-    .fh-big {
-      font-family: 'Fraunces', Georgia, serif;
-      font-size: clamp(54px, 18vw, 80px);
-      font-weight: 900; line-height: 0.82;
-      letter-spacing: -3px;
-      background: linear-gradient(135deg, #F4D47F 0%, #D4AF37 55%, #A3811F);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-feature-settings: 'tnum';
-    }
+    .fh-big { font-family: 'Fraunces', Georgia, serif; font-size: clamp(54px, 18vw, 80px); font-weight: 900; line-height: 0.82; letter-spacing: -3px; background: linear-gradient(135deg, #F4D47F 0%, #D4AF37 55%, #A3811F); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-feature-settings: 'tnum'; }
     .fh-big-suffix { font-family: 'Fraunces', Georgia, serif; font-size: clamp(22px, 7vw, 30px); font-weight: 400; color: #D4AF37; margin-left: 2px; }
     .fh-target-wrap { text-align: right; padding-bottom: 4px; flex-shrink: 0; }
     .fh-pct { font-family: 'Fraunces', Georgia, serif; font-size: clamp(22px, 6.5vw, 28px); font-weight: 800; display: block; line-height: 1; }
@@ -125,8 +154,8 @@
     .fh-next.past .fh-next-countdown { color: #ff5a5a; }
     .fh-next-why { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 11px; color: #7a7a85; margin-top: 4px; line-height: 1.3; }
 
-    .fh-log { background: #14141b; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
-    .fh-log h3 { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 19px; font-weight: 700; color: #e8e8ec; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: -0.3px; }
+    .fh-log, .fh-archive { background: #14141b; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px; margin-bottom: 14px; }
+    .fh-log h3, .fh-archive h3 { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 19px; font-weight: 700; color: #e8e8ec; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; letter-spacing: -0.3px; }
     .fh-log-count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #7a7a85; letter-spacing: 1.2px; text-transform: uppercase; font-style: normal; font-weight: 700; }
     .fh-empty { text-align: center; padding: 28px 16px; color: #4a4a54; font-size: 13px; font-family: 'Fraunces', Georgia, serif; font-style: italic; letter-spacing: 0.2px; }
     .fh-entry { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 12px 2px; border-bottom: 1px solid rgba(255,255,255,0.05); min-height: 44px; }
@@ -139,7 +168,64 @@
     .fh-e-macro { font-size: 12px; color: #D4AF37; font-weight: 700; text-align: right; letter-spacing: 0.2px; line-height: 1.3; }
     .fh-e-cal { font-size: 9px; color: #7a7a85; font-weight: 500; }
 
-    .fh-close { width: 100%; background: linear-gradient(135deg, #D4AF37, #b8932a); color: #0a0a0f; border: none; min-height: 60px; padding: 0 16px; border-radius: 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 800; letter-spacing: 2.2px; cursor: pointer; transition: all 0.1s; box-shadow: 0 2px 12px rgba(212,175,55,0.28); }
+    /* ARCHIVE — Recent Days section */
+    .fh-arch-day { border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .fh-arch-day:last-child { border-bottom: none; }
+    .fh-arch-head {
+      display: flex;
+      align-items: center;
+      padding: 12px 2px;
+      gap: 10px;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .fh-arch-head:active { background: rgba(255,255,255,0.02); }
+    .fh-arch-date {
+      font-size: 11px;
+      color: #c0c0cc;
+      letter-spacing: 0.8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      min-width: 80px;
+    }
+    .fh-arch-stats {
+      flex: 1;
+      font-size: 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .fh-arch-stats > span:first-child { font-weight: 800; font-family: 'Fraunces', Georgia, serif; font-size: 14px; }
+    .fh-arch-pct { font-size: 10px; font-weight: 600; }
+    .fh-arch-cal { color: #7a7a85; font-size: 10px; font-weight: 500; }
+    .fh-arch-caret {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: #D4AF37;
+      font-weight: 800;
+      min-width: 20px;
+      text-align: center;
+    }
+    .fh-arch-body { padding: 4px 0 12px; border-top: 1px dashed rgba(255,255,255,0.06); margin-top: 4px; }
+    .fh-arch-entry { padding: 8px 2px !important; }
+
+    .fh-close {
+      width: 100%;
+      background: linear-gradient(135deg, #D4AF37, #b8932a);
+      color: #0a0a0f;
+      border: none;
+      min-height: 60px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      cursor: pointer;
+      transition: all 0.1s;
+      box-shadow: 0 2px 12px rgba(212,175,55,0.28);
+    }
     .fh-close:active:not(:disabled) { transform: scale(0.98); box-shadow: 0 1px 6px rgba(212,175,55,0.22); }
     .fh-close:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
     .fh-close.done { background: linear-gradient(135deg, #3dcf7a, #2ba85f); color: #0a0a0f; box-shadow: 0 2px 14px rgba(61,207,122,0.4); animation: pulseGreen 0.6s ease-out; }
@@ -160,16 +246,15 @@
 <body>
   <div id="root"><div class="loading">Loading Food Hud...</div></div>
 
-  <!-- React UMD (no Babel needed - JS is pre-compiled) -->
   <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 
-  <!-- Pre-compiled app code -->
   <script>
 const {
   useState,
   useEffect,
-  useMemo
+  useMemo,
+  useRef
 } = React;
 const TODAY_DATE = {
   year: 2026,
@@ -186,7 +271,7 @@ const TODAY_LOG = [{
   fib: 1,
   note: "Breakfast -- protein-zero breakfast pattern killed"
 }];
-const LAST_UPDATED = "12:43 PM";
+const LAST_UPDATED = "2:00 PM";
 const NEXT_FUEL = {
   time: "2:00 PM",
   item: "Premier Protein shake + handful of almonds",
@@ -203,13 +288,68 @@ const DOW_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 const MON_FULL = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DOW_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MON_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const ARCHIVE_KEY_PREFIX = "sfx-food-archive-";
+const ARCHIVE_MAX_DAYS = 7;
+const todayDateKey = function () {
+  const d = new Date();
+  const pad = function (n) {
+    return String(n).padStart(2, "0");
+  };
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+};
+const readArchive = function () {
+  const archives = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.indexOf(ARCHIVE_KEY_PREFIX) === 0) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          archives.push(data);
+        } catch (e) {}
+      }
+    }
+  } catch (e) {}
+  archives.sort(function (a, b) {
+    return b.dateKey.localeCompare(a.dateKey);
+  });
+  return archives.slice(0, ARCHIVE_MAX_DAYS);
+};
+const pruneOldArchives = function () {
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.indexOf(ARCHIVE_KEY_PREFIX) === 0) keys.push(key);
+    }
+    keys.sort();
+    if (keys.length > ARCHIVE_MAX_DAYS) {
+      const toRemove = keys.slice(0, keys.length - ARCHIVE_MAX_DAYS);
+      toRemove.forEach(function (k) {
+        localStorage.removeItem(k);
+      });
+    }
+  } catch (e) {}
+};
 function FoodHUD() {
   const [now, setNow] = useState(Date.now());
   const [closedOut, setClosedOut] = useState(false);
   const [fallbackText, setFallbackText] = useState(null);
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 30000);
-    return () => clearInterval(id);
+  const [archive, setArchive] = useState([]);
+  const [expandedDay, setExpandedDay] = useState(null);
+  const [cameraError, setCameraError] = useState(null);
+  const cameraInputRef = useRef(null);
+  useEffect(function () {
+    const id = setInterval(function () {
+      setNow(Date.now());
+    }, 30000);
+    return function () {
+      clearInterval(id);
+    };
+  }, []);
+  useEffect(function () {
+    pruneOldArchives();
+    setArchive(readArchive());
   }, []);
   const nowD = new Date(now);
   const dow = nowD.getDay();
@@ -273,7 +413,34 @@ function FoodHUD() {
     if (r >= 0.40) return "#EF9F27";
     return "#ff5a5a";
   };
-  const closeOut = async function () {
+  const triggerCamera = function () {
+    setCameraError(null);
+    if (cameraInputRef.current) cameraInputRef.current.click();
+  };
+  const handlePhotoSelected = async function (event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    event.target.value = "";
+    try {
+      if (navigator.canShare && navigator.canShare({
+        files: [file]
+      })) {
+        await navigator.share({
+          files: [file],
+          title: "Food HUD",
+          text: "Log this meal"
+        });
+        return;
+      }
+    } catch (e) {
+      if (e && e.name === "AbortError") return;
+    }
+    setCameraError("Share failed. Open Claude app manually and attach the photo from Gallery.");
+    setTimeout(function () {
+      setCameraError(null);
+    }, 5000);
+  };
+  const buildCloseOutText = function () {
     const head = "## " + DOW_FULL[dow].toUpperCase() + " " + MON_FULL[nowD.getMonth()] + " " + nowD.getDate() + ", " + nowD.getFullYear() + "\n";
     const th = "| Time | Food | Protein | Fat | Carbs | Cals | Fiber | Notes |\n|:-----|:-----|-------:|----:|------:|-----:|------:|:------|\n";
     const rows = TODAY_LOG.map(function (e) {
@@ -281,11 +448,31 @@ function FoodHUD() {
     }).join("\n");
     const tot = "\n| **TOTAL** | | **" + totals.p + "g** | **" + totals.f + "g** | **" + totals.c + "g** | **" + totals.cal + "** | **" + totals.fib + "** | |";
     const pctRow = "| **% TARGET** | | **" + Math.round(totals.p / TARGETS.protein * 100) + "%** | **" + Math.round(totals.f / TARGETS.fat * 100) + "%** | **" + Math.round(totals.c / TARGETS.carbs * 100) + "%** | **" + Math.round(totals.cal / TARGETS.cal * 100) + "%** | **" + Math.round(totals.fib / TARGETS.fiber * 100) + "%** | |";
-    const txt = head + "\n" + th + rows + tot + "\n" + pctRow + "\n";
+    return head + "\n" + th + rows + tot + "\n" + pctRow + "\n";
+  };
+  const archiveToday = function (txt) {
+    try {
+      const snapshot = {
+        dateKey: todayDateKey(),
+        dateDisplay: DOW_SHORT[dow] + " " + MON_SHORT[nowD.getMonth()] + " " + nowD.getDate(),
+        entries: TODAY_LOG,
+        totals: totals,
+        markdown: txt,
+        committedAt: new Date().toISOString()
+      };
+      localStorage.setItem(ARCHIVE_KEY_PREFIX + snapshot.dateKey, JSON.stringify(snapshot));
+      pruneOldArchives();
+      setArchive(readArchive());
+    } catch (e) {}
+  };
+  const closeOut = async function () {
+    const txt = buildCloseOutText();
+    archiveToday(txt);
     try {
       if (navigator.share) {
         await navigator.share({
-          text: txt
+          text: txt,
+          title: "Food HUD Close Out"
         });
         setClosedOut(true);
         setTimeout(function () {
@@ -293,7 +480,9 @@ function FoodHUD() {
         }, 4000);
         return;
       }
-    } catch (e) {}
+    } catch (e) {
+      if (e && e.name === "AbortError") return;
+    }
     try {
       await navigator.clipboard.writeText(txt);
       setClosedOut(true);
@@ -308,7 +497,16 @@ function FoodHUD() {
   const proteinColor = color(totals.p, TARGETS.protein);
   return /*#__PURE__*/React.createElement("div", {
     className: "fh"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("input", {
+    ref: cameraInputRef,
+    type: "file",
+    accept: "image/*",
+    capture: "environment",
+    style: {
+      display: "none"
+    },
+    onChange: handlePhotoSelected
+  }), /*#__PURE__*/React.createElement("div", {
     className: "fh-header"
   }, /*#__PURE__*/React.createElement("div", {
     className: "fh-title"
@@ -330,7 +528,18 @@ function FoodHUD() {
     className: "fh-updated"
   }, /*#__PURE__*/React.createElement("span", {
     className: "fh-updated-dot"
-  }), "Claude-tracked, last update ", LAST_UPDATED), past6PM && /*#__PURE__*/React.createElement("div", {
+  }), "Claude-tracked, last update ", LAST_UPDATED), /*#__PURE__*/React.createElement("button", {
+    className: "fh-camera",
+    onClick: triggerCamera
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "fh-camera-icon"
+  }, "[ + ]"), /*#__PURE__*/React.createElement("span", {
+    className: "fh-camera-label"
+  }, "LOG A MEAL"), /*#__PURE__*/React.createElement("span", {
+    className: "fh-camera-hint"
+  }, "Snap photo, send to Claude")), cameraError && /*#__PURE__*/React.createElement("div", {
+    className: "fh-flash error"
+  }, cameraError), past6PM && /*#__PURE__*/React.createElement("div", {
     className: "fh-warn"
   }, "6 PM CARB CUTOFF, protein + fat only, late carbs = zero N3"), /*#__PURE__*/React.createElement("div", {
     className: "fh-hero"
@@ -454,7 +663,7 @@ function FoodHUD() {
     className: "fh-log-count"
   }, TODAY_LOG.length, " ", TODAY_LOG.length === 1 ? "entry" : "entries")), TODAY_LOG.length === 0 ? /*#__PURE__*/React.createElement("div", {
     className: "fh-empty"
-  }, "Nothing yet. Send Claude a food photo to start.") : TODAY_LOG.map(function (e, i) {
+  }, "Nothing yet. Tap LOG A MEAL above.") : TODAY_LOG.map(function (e, i) {
     return /*#__PURE__*/React.createElement("div", {
       key: i,
       className: "fh-entry"
@@ -471,11 +680,64 @@ function FoodHUD() {
     }, e.p, "g", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
       className: "fh-e-cal"
     }, e.cal, " cal")));
+  })), archive.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "fh-archive"
+  }, /*#__PURE__*/React.createElement("h3", null, "Recent Days", /*#__PURE__*/React.createElement("span", {
+    className: "fh-log-count"
+  }, archive.length, " committed")), archive.map(function (day) {
+    const isExpanded = expandedDay === day.dateKey;
+    const proteinPctArchive = Math.round(day.totals.p / TARGETS.protein * 100);
+    const proteinColorArchive = day.totals.p >= TARGETS.protein * 0.95 ? "#3dcf7a" : day.totals.p >= TARGETS.protein * 0.70 ? "#f7d94e" : "#ff5a5a";
+    return /*#__PURE__*/React.createElement("div", {
+      key: day.dateKey,
+      className: "fh-arch-day"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "fh-arch-head",
+      onClick: function () {
+        setExpandedDay(isExpanded ? null : day.dateKey);
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "fh-arch-date"
+    }, day.dateDisplay), /*#__PURE__*/React.createElement("span", {
+      className: "fh-arch-stats"
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: proteinColorArchive
+      }
+    }, day.totals.p, "g"), /*#__PURE__*/React.createElement("span", {
+      className: "fh-arch-pct",
+      style: {
+        color: proteinColorArchive
+      }
+    }, "(", proteinPctArchive, "%)"), /*#__PURE__*/React.createElement("span", {
+      className: "fh-arch-cal"
+    }, ", ", day.totals.cal, " cal")), /*#__PURE__*/React.createElement("span", {
+      className: "fh-arch-caret"
+    }, isExpanded ? "-" : "+")), isExpanded && /*#__PURE__*/React.createElement("div", {
+      className: "fh-arch-body"
+    }, day.entries.map(function (e, i) {
+      return /*#__PURE__*/React.createElement("div", {
+        key: i,
+        className: "fh-entry fh-arch-entry"
+      }, /*#__PURE__*/React.createElement("span", {
+        className: "fh-e-time"
+      }, e.time), /*#__PURE__*/React.createElement("div", {
+        className: "fh-e-body"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "fh-e-name"
+      }, e.name), e.note && /*#__PURE__*/React.createElement("div", {
+        className: "fh-e-note"
+      }, e.note)), /*#__PURE__*/React.createElement("div", {
+        className: "fh-e-macro"
+      }, e.p, "g", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
+        className: "fh-e-cal"
+      }, e.cal, " cal")));
+    })));
   })), /*#__PURE__*/React.createElement("button", {
     className: "fh-close" + (closedOut ? " done" : ""),
     onClick: closeOut,
     disabled: TODAY_LOG.length === 0
-  }, closedOut ? "COPIED, PASTE TO CLAUDE" : "CLOSE OUT DAY"), fallbackText && /*#__PURE__*/React.createElement("div", {
+  }, closedOut ? "COMMITTED, SENT TO CLAUDE" : "COMMIT DAY & SEND TO CLAUDE"), fallbackText && /*#__PURE__*/React.createElement("div", {
     className: "fh-modal",
     onClick: function () {
       setFallbackText(null);
@@ -491,7 +753,7 @@ function FoodHUD() {
     className: "fh-mtitle"
   }, "Send to Claude"), /*#__PURE__*/React.createElement("div", {
     className: "fh-msub"
-  }, "Clipboard blocked, select all and copy manually"), /*#__PURE__*/React.createElement("textarea", {
+  }, "Share blocked, select all and copy manually"), /*#__PURE__*/React.createElement("textarea", {
     className: "fh-mtxt",
     value: fallbackText,
     readOnly: true,
@@ -513,7 +775,6 @@ root.render(/*#__PURE__*/React.createElement(FoodHUD, null));
 
   </script>
 
-  <!-- Register service worker for PWA install -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

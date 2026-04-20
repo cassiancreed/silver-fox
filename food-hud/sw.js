@@ -1,5 +1,5 @@
 // Food HUD Service Worker
-const CACHE_NAME = 'food-hud-v2';
+const CACHE_NAME = 'food-hud-v3';
 const ASSETS = [
   './',
   './index.html',
