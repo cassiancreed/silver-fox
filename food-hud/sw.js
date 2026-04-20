@@ -1,10 +1,12 @@
 // Food HUD Service Worker
-const CACHE_NAME = 'food-hud-v1';
+const CACHE_NAME = 'food-hud-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,7 +35,6 @@ self.addEventListener('fetch', (event) => {
         cached ||
         fetch(event.request)
           .then((response) => {
-            // Cache React/Babel CDN responses too
             if (response && response.status === 200 && response.type === 'basic') {
               const clone = response.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
