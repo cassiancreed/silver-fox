@@ -1,0 +1,19 @@
+{
+  "name": "Silver Fox Daily Ops",
+  "short_name": "Silver Fox",
+  "description": "Operation Silver Fox - Daily Execution Checklist",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e14",
+  "theme_color": "#d4a574",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

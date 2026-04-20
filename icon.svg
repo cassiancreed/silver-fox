@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e14"/>
+      <stop offset="100%" stop-color="#1a222e"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a574"/>
+      <stop offset="100%" stop-color="#e8c294"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)" rx="96"/>
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#gold)" stroke-width="4" opacity="0.3"/>
+  <text x="256" y="200" font-family="Georgia, serif" font-size="80" font-style="italic" font-weight="700" fill="url(#gold)" text-anchor="middle">SF</text>
+  <text x="256" y="290" font-family="monospace" font-size="28" font-weight="600" fill="#e8ecf2" text-anchor="middle" letter-spacing="4">SILVER</text>
+  <text x="256" y="330" font-family="monospace" font-size="28" font-weight="600" fill="#e8ecf2" text-anchor="middle" letter-spacing="4">FOX</text>
+  <line x1="180" y1="370" x2="332" y2="370" stroke="url(#gold)" stroke-width="2"/>
+  <text x="256" y="405" font-family="monospace" font-size="16" fill="#9aa3b2" text-anchor="middle" letter-spacing="3">DAILY OPS</text>
+</svg>

@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Ops — Operation Silver Fox</title>
+<meta name="theme-color" content="#d4a574">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Silver Fox">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -494,7 +502,7 @@ body {
 
 <div class="footer">
   <div class="tagline">"As the weed grows through concrete."</div>
-  <div>CRUNCH-locked · Updated Apr 20, 2026 · v2.2</div>
+  <div>CRUNCH-locked · Updated Apr 20, 2026 · v2.4</div>
 </div>
 
 </div>
@@ -560,7 +568,8 @@ const BLOCKS = [
       { id: '10:00:10', name: 'Vitamin D3 plus K2 5000 IU', container: 'Prescription Box' },
       { id: '10:00:11', name: 'Tongkat Ali LJ100 200mg', container: 'Prescription Box' },
       { id: '10:00:12', name: 'NAC 1200mg (2 caps)', container: 'Prescription Box', note: 'CKD + liver support trial — Apr 17 start, 8-12 wk window. 6 hrs clear of 4 AM Levo (safe). Take WITH breakfast fat. Review Jun 12 – Jul 10.' },
-      { id: '10:00:13', name: 'Creatine Monohydrate 5g', container: 'Powder — ROOM TEMP water ONLY', note: 'Dr. Sekhon approved Apr 19 despite CKD 3a. Muscle preservation counter (SMM 74.6 floor). NEVER hot water (degrades to creatinine). NEVER cold (under-dissolves). Saturation compound — daily, no skip days.', isNew: true }
+      { id: '10:00:13', name: 'Citicoline 300mg', container: 'Prescription Box', note: 'Acetylcholine precursor — focus, memory, mind-muscle connection. Replaces Alpha-GPC (BANNED for stroke/TMAO risk). Peak ~3hr = lands during afternoon strength training. Apr 20 start.', isNew: true },
+      { id: '10:00:14', name: 'Creatine Monohydrate 5g', container: 'Powder — ROOM TEMP water ONLY', note: 'Dr. Sekhon approved Apr 19 despite CKD 3a. Muscle preservation counter (SMM 74.6 floor). NEVER hot water (degrades to creatinine). NEVER cold (under-dissolves). Saturation compound — daily, no skip days.', isNew: true }
     ]
   },
   {
@@ -585,7 +594,8 @@ const BLOCKS = [
     category: 'cat-afternoon',
     items: [
       { id: '15:45:01', name: 'Apigenin 50mg', container: 'Prescription Box', note: 'Aromatase inhibition (CYP19A1 TT)' },
-      { id: '15:45:02', name: 'Gabapentin 800mg (dose 2 of 3)', container: 'Prescription Box' }
+      { id: '15:45:02', name: 'Taurine 2g (2 caps)', container: 'Prescription Box', note: 'GABA-like calming, cardiac rhythm, bile flow. Monitor BP this week (stacked with 5 BP-lowering agents). Watch for serotonin signs first 7 days (Duloxetine interaction). Apr 20 start.', isNew: true },
+      { id: '15:45:03', name: 'Gabapentin 800mg (dose 2 of 3)', container: 'Prescription Box' }
     ]
   },
   {
@@ -612,7 +622,7 @@ const BLOCKS = [
       { id: '21:30:01', name: 'Melatonin 0.3mg', container: 'Prescription Box' },
       { id: '21:30:02', name: 'Kava capsule', container: 'Prescription Box' },
       { id: '21:30:03', name: 'THC gummy 10mg', container: 'Prescription Box', skipTuesday: true },
-      { id: '21:30:08', name: 'L-theanine 100-200mg', container: 'Prescription Box', note: 'GABA-ergic pair with Kava + Glycine. Zero tolerance, no Rx conflicts. Start 100mg, titrate.', isNew: true },
+      { id: '21:30:08', name: 'L-theanine 100-200mg', container: 'Prescription Box', note: 'GABA-ergic pair with Kava + Glycine. Zero tolerance, no Rx conflicts. Start 100mg, titrate.' },
       { id: '21:30:05', name: 'Glycine 3-5g in sleep drink', container: 'Powder Bag' },
       { id: '21:30:06', name: 'Aspirin 81mg', container: 'Orange Bucket' },
       { id: '21:30:07', name: 'Close out food log with Claude', container: 'Phone → Claude app', note: 'Say: "close out [day] food" — I compile the day and update FOOD_LOG' }
@@ -784,6 +794,13 @@ function checkMidnightReset() {
   }
 }
 setInterval(checkMidnightReset, 60000);
+
+// Register service worker for offline mode
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration:', err));
+  });
+}
 
 render();
 </script>
