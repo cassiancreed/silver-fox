@@ -252,7 +252,7 @@
     </div>
   </div>
 
-  <div class="footer">SEXY_SCORE DESKTOP v1.1 · BRIO + API KEY · OPERATION SILVER FOX</div>
+  <div class="footer">SEXY_SCORE DESKTOP v1.2 · SONNET 4.6 · OPERATION SILVER FOX</div>
 </div>
 
 <script>
@@ -318,7 +318,7 @@
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': k, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
+        body: JSON.stringify({ model: 'claude-sonnet-4-6', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
       });
       if (res.ok) { alert('✓ Key works. Click SAVE KEY to persist.'); }
       else { const t = await res.text(); showError('Key test failed: ' + res.status + ' ' + t.slice(0, 200)); }
@@ -440,7 +440,7 @@ Return JSON ONLY, no markdown fence:
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514', max_tokens: 1200,
+          model: 'claude-sonnet-4-6', max_tokens: 1200,
           messages: [{
             role: 'user',
             content: [
