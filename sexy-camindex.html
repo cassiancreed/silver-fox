@@ -10,8 +10,7 @@
     --border: #1a1a1e; --border-bright: #2a2a30;
     --gold: #D4AF37; --gold-dim: #8a7528;
     --green: #1D9E75; --orange: #EF9F27; --red: #E24B4A;
-    --blue: #5B9BF5; --purple: #A78BFA;
-    --text: #e5e5e5; --muted: #666; --muted-2: #999;
+    --blue: #5B9BF5; --text: #e5e5e5; --muted: #666; --muted-2: #999;
     --mono: 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,72 +18,35 @@
   body { min-height: 100vh; padding: 16px; }
   .app { max-width: 960px; margin: 0 auto; }
 
-  header.top {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 16px;
-  }
+  header.top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
   header.top .title { font-size: 15px; font-weight: 900; letter-spacing: 2px; color: var(--gold); }
   header.top .sub { font-size: 10px; color: var(--muted); letter-spacing: 1.5px; }
 
   .grid-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 14px; }
   @media (max-width: 800px) { .grid-2 { grid-template-columns: 1fr; } }
 
-  .panel {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; padding: 14px;
-  }
-  .panel-title {
-    font-size: 10px; font-weight: 800; color: var(--gold);
-    letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase;
-  }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
+  .panel-title { font-size: 10px; font-weight: 800; color: var(--gold); letter-spacing: 2px; margin-bottom: 10px; text-transform: uppercase; }
 
-  .camera-wrap {
-    position: relative; width: 100%; background: #000;
-    border-radius: 4px; overflow: hidden; aspect-ratio: 16/9;
-  }
+  .camera-wrap { position: relative; width: 100%; background: #000; border-radius: 4px; overflow: hidden; aspect-ratio: 16/9; }
   video, .captured-img { width: 100%; height: 100%; object-fit: cover; display: block; }
   canvas { display: none; }
 
-  .cam-overlay {
-    position: absolute; top: 8px; left: 8px; right: 8px;
-    font-size: 10px; letter-spacing: 1px; color: var(--gold);
-    background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 3px;
-    text-align: center; pointer-events: none;
-  }
-  .cam-countdown {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    font-size: 96px; font-weight: 900; color: var(--gold);
-    text-shadow: 0 0 20px rgba(212,175,55,0.6);
-    display: none;
-  }
+  .cam-overlay { position: absolute; top: 8px; left: 8px; right: 8px; font-size: 10px; letter-spacing: 1px; color: var(--gold); background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 3px; text-align: center; pointer-events: none; }
+  .cam-countdown { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 96px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.6); display: none; }
   .cam-countdown.active { display: block; }
 
-  .device-select {
-    width: 100%; background: var(--surface-2); color: var(--text);
-    border: 1px solid var(--border-bright); border-radius: 3px;
-    padding: 8px; font-family: var(--mono); font-size: 10px; margin-bottom: 10px;
-  }
+  .device-select { width: 100%; background: var(--surface-2); color: var(--text); border: 1px solid var(--border-bright); border-radius: 3px; padding: 8px; font-family: var(--mono); font-size: 10px; margin-bottom: 10px; }
 
   .mode-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
-  .mode-btn {
-    background: var(--surface-2); border: 1px solid var(--border-bright);
-    color: var(--muted-2); font-family: var(--mono); font-size: 10px; font-weight: 700;
-    padding: 10px 4px; cursor: pointer; letter-spacing: 1px; border-radius: 3px;
-    transition: all 0.15s;
-  }
+  .mode-btn { background: var(--surface-2); border: 1px solid var(--border-bright); color: var(--muted-2); font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 10px 4px; cursor: pointer; letter-spacing: 1px; border-radius: 3px; }
   .mode-btn:hover { color: var(--text); }
   .mode-btn.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
   .controls { display: grid; gap: 8px; grid-template-columns: 1fr 1fr 1fr; }
   .controls.two { grid-template-columns: 1fr 1fr; }
-  .controls.full { grid-template-columns: 1fr; }
 
-  .btn {
-    background: var(--surface-2); border: 1px solid var(--border-bright);
-    color: var(--text); font-family: var(--mono); font-size: 11px; font-weight: 700;
-    padding: 11px 8px; cursor: pointer; letter-spacing: 1.5px; border-radius: 3px;
-    transition: all 0.15s;
-  }
+  .btn { background: var(--surface-2); border: 1px solid var(--border-bright); color: var(--text); font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 11px 8px; cursor: pointer; letter-spacing: 1.5px; border-radius: 3px; }
   .btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
   .btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .btn-primary { background: var(--gold); color: #000; border-color: var(--gold); }
@@ -93,12 +55,7 @@
   .btn-success:hover:not(:disabled) { background: #25b689; color: #fff; }
   .btn-danger { background: transparent; border-color: var(--red); color: var(--red); }
 
-  /* Score display */
-  .composite-row {
-    background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.02));
-    border: 1px solid var(--gold-dim); padding: 14px; border-radius: 4px;
-    margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 14px;
-  }
+  .composite-row { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.02)); border: 1px solid var(--gold-dim); padding: 14px; border-radius: 4px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
   .composite-row .big { font-size: 44px; font-weight: 900; color: var(--gold); line-height: 1; font-family: var(--mono); }
   .composite-row .label { font-size: 10px; color: var(--gold); letter-spacing: 2px; margin-bottom: 4px; }
   .composite-row .vs-base { font-size: 10px; color: var(--muted-2); }
@@ -118,56 +75,42 @@
   .finding-col.fixes h4 { color: var(--red); }
   .finding-col div.item { font-size: 11px; padding: 3px 0; line-height: 1.4; }
 
-  .rationale {
-    font-size: 11px; color: var(--muted-2); line-height: 1.5;
-    padding: 10px; background: var(--surface-2); border-radius: 4px;
-    border-left: 3px solid var(--gold); margin-bottom: 10px;
-  }
+  .rationale { font-size: 11px; color: var(--muted-2); line-height: 1.5; padding: 10px; background: var(--surface-2); border-radius: 4px; border-left: 3px solid var(--gold); margin-bottom: 10px; }
 
-  /* Loading */
-  .loading {
-    display: none; padding: 40px 20px; text-align: center;
-    color: var(--gold); font-size: 12px; letter-spacing: 2px;
-  }
+  .loading { display: none; padding: 40px 20px; text-align: center; color: var(--gold); font-size: 12px; letter-spacing: 2px; }
   .loading.show { display: block; }
-  .spinner {
-    display: inline-block; width: 16px; height: 16px;
-    border: 2px solid var(--border-bright); border-top-color: var(--gold);
-    border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle;
-  }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border-bright); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* History */
-  .hist-item {
-    display: grid; grid-template-columns: 55px 60px 1fr auto;
-    gap: 8px; align-items: center; padding: 7px 4px;
-    border-bottom: 1px solid var(--border); font-size: 10px;
-  }
+  .hist-item { display: grid; grid-template-columns: 55px 60px 1fr auto; gap: 8px; align-items: center; padding: 7px 4px; border-bottom: 1px solid var(--border); font-size: 10px; }
   .hist-item:last-child { border-bottom: none; }
   .hist-item .date { color: var(--muted-2); font-size: 9px; }
   .hist-item .mode { color: var(--gold); font-weight: 700; letter-spacing: 1px; font-size: 9px; }
   .hist-item .sc { color: var(--muted-2); font-size: 9px; }
   .hist-item .cmp { font-size: 16px; font-weight: 900; color: var(--gold); }
 
-  .error-box { background: rgba(226,75,74,0.1); border: 1px solid var(--red); padding: 10px; border-radius: 4px; color: var(--red); font-size: 11px; margin-bottom: 10px; }
-  .info-box { background: rgba(91,155,245,0.08); border: 1px solid var(--blue); padding: 10px; border-radius: 4px; color: var(--blue); font-size: 10px; margin-bottom: 10px; line-height: 1.5; }
+  .error-box { background: rgba(226,75,74,0.1); border: 1px solid var(--red); padding: 10px; border-radius: 4px; color: var(--red); font-size: 11px; margin-bottom: 10px; word-break: break-word; }
   .empty { padding: 20px; text-align: center; color: var(--muted); font-size: 11px; }
 
   .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
-  .stat-strip .s {
-    background: var(--surface-2); border: 1px solid var(--border);
-    padding: 8px; border-radius: 4px; text-align: center;
-  }
+  .stat-strip .s { background: var(--surface-2); border: 1px solid var(--border); padding: 8px; border-radius: 4px; text-align: center; }
   .stat-strip .s .v { font-size: 18px; font-weight: 900; color: var(--gold); }
   .stat-strip .s .l { font-size: 8px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
 
   .footer { text-align: center; color: var(--muted); font-size: 9px; padding-top: 14px; letter-spacing: 1.5px; border-top: 1px solid var(--border); margin-top: 14px; }
 
-  .cam-hint-block {
-    background: var(--surface-2); border-radius: 4px; padding: 10px;
-    font-size: 10px; color: var(--gold); letter-spacing: 1.2px; text-align: center;
-    margin-bottom: 10px; border: 1px solid var(--border);
-  }
+  .key-panel { background: var(--surface); border: 1px solid var(--orange); border-radius: 6px; padding: 14px; margin-bottom: 14px; }
+  .key-panel.set { border-color: var(--green); }
+  .key-input { width: 100%; background: var(--surface-2); color: var(--text); border: 1px solid var(--border-bright); border-radius: 3px; padding: 10px; font-family: var(--mono); font-size: 11px; margin-bottom: 8px; }
+  .key-input:focus { border-color: var(--gold); outline: none; }
+  .key-help { font-size: 10px; color: var(--muted-2); line-height: 1.6; margin-top: 8px; }
+  .key-help a { color: var(--blue); text-decoration: none; }
+  .key-help a:hover { text-decoration: underline; }
+  .key-status { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+  .key-status.ok { color: var(--green); }
+  details { margin-top: 8px; }
+  details summary { cursor: pointer; color: var(--muted-2); font-size: 10px; letter-spacing: 1px; padding: 4px 0; }
+  details summary:hover { color: var(--gold); }
 </style>
 </head>
 <body>
@@ -183,30 +126,54 @@
     </div>
   </header>
 
+  <div class="key-panel" id="key-panel">
+    <div class="panel-title" id="key-title">⚠ API KEY REQUIRED</div>
+    <div id="key-setup">
+      <input type="password" class="key-input" id="key-input" placeholder="Paste your Anthropic API key here (sk-ant-...)" autocomplete="off">
+      <div class="controls two">
+        <button class="btn btn-primary" id="key-save">SAVE KEY</button>
+        <button class="btn" id="key-test" disabled>TEST KEY</button>
+      </div>
+      <details>
+        <summary>▸ HOW TO GET AN API KEY (2 MIN, ONE-TIME)</summary>
+        <div class="key-help">
+          1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> and sign in<br>
+          2. Click <b style="color:var(--gold)">Settings</b> → <b style="color:var(--gold)">API Keys</b><br>
+          3. Click <b style="color:var(--gold)">Create Key</b> — name it "sexy-cam"<br>
+          4. Copy the key (starts with <code>sk-ant-</code>)<br>
+          5. Paste above, click SAVE KEY<br>
+          6. Add ~$5-10 of credits at Settings → Billing (covers months)<br>
+          <br>
+          <b style="color:var(--gold)">Privacy:</b> Key stored only in your browser's localStorage. Sent only to Anthropic's API. This page lives on your GitHub — no third-party server.
+        </div>
+      </details>
+    </div>
+    <div id="key-saved" style="display:none">
+      <div class="key-status ok">
+        <span>✓ API KEY SAVED · <span id="key-masked"></span></span>
+        <button class="btn" id="key-change" style="padding:4px 10px; font-size:9px">CHANGE</button>
+      </div>
+    </div>
+  </div>
+
   <div class="grid-2">
-    <!-- LEFT: Camera + Score -->
     <div>
       <div class="panel" id="camera-panel">
         <div class="panel-title">CAPTURE</div>
-
-        <select id="device-select" class="device-select">
-          <option>Loading cameras...</option>
-        </select>
-
+        <div id="error-slot"></div>
+        <select id="device-select" class="device-select"><option>Loading cameras...</option></select>
         <div class="camera-wrap">
           <video id="video" autoplay playsinline muted></video>
           <canvas id="canvas"></canvas>
           <div class="cam-overlay" id="cam-overlay">TAP "START CAMERA" TO BEGIN</div>
           <div class="cam-countdown" id="cam-countdown">3</div>
         </div>
-
         <div class="mode-row">
           <button class="mode-btn active" data-mode="FACE">FACE</button>
           <button class="mode-btn" data-mode="OUTFIT">OUTFIT</button>
           <button class="mode-btn" data-mode="PHYSIQUE">PHYSIQUE</button>
           <button class="mode-btn" data-mode="DEPLOY">DEPLOY</button>
         </div>
-
         <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px">
           <button class="btn" id="start-cam">START CAMERA</button>
         </div>
@@ -216,9 +183,9 @@
         </div>
       </div>
 
-      <!-- Preview -->
       <div class="panel" id="preview-panel" style="display:none; margin-top:12px">
         <div class="panel-title">REVIEW</div>
+        <div id="preview-error-slot"></div>
         <div class="camera-wrap">
           <img id="captured" class="captured-img" alt="captured">
         </div>
@@ -229,12 +196,10 @@
         </div>
       </div>
 
-      <!-- Loading -->
       <div class="panel loading" id="loading" style="margin-top:12px">
         <span class="spinner"></span>CRUNCHING · BRUTAL MODE · 5-8 SEC
       </div>
 
-      <!-- Score Display -->
       <div id="score-panel" style="display:none; margin-top:12px">
         <div class="panel">
           <div class="panel-title">RESULT</div>
@@ -247,14 +212,8 @@
           </div>
           <div class="score-grid" id="score-grid"></div>
           <div class="findings">
-            <div class="finding-col wins">
-              <h4>✓ WINS</h4>
-              <div id="wins-list"></div>
-            </div>
-            <div class="finding-col fixes">
-              <h4>✗ FIXES</h4>
-              <div id="fixes-list"></div>
-            </div>
+            <div class="finding-col wins"><h4>✓ WINS</h4><div id="wins-list"></div></div>
+            <div class="finding-col fixes"><h4>✗ FIXES</h4><div id="fixes-list"></div></div>
           </div>
           <div class="rationale" id="rationale"></div>
           <div class="controls two">
@@ -265,7 +224,6 @@
       </div>
     </div>
 
-    <!-- RIGHT: Stats + History -->
     <div>
       <div class="panel">
         <div class="panel-title">STATS</div>
@@ -276,12 +234,10 @@
           <div class="s"><div class="v" style="color:var(--orange)">6.83</div><div class="l">BASE</div></div>
         </div>
       </div>
-
       <div class="panel" style="margin-top:12px">
         <div class="panel-title">HISTORY (LAST 25)</div>
         <div id="history"></div>
       </div>
-
       <div class="panel" style="margin-top:12px">
         <div class="panel-title">TIPS FOR BRIO</div>
         <div style="font-size:10px; color:var(--muted-2); line-height:1.6">
@@ -296,48 +252,80 @@
     </div>
   </div>
 
-  <div class="footer">SEXY_SCORE DESKTOP v1.0 · RUN LOCALLY OR VIA GITHUB PAGES</div>
+  <div class="footer">SEXY_SCORE DESKTOP v1.1 · BRIO + API KEY · OPERATION SILVER FOX</div>
 </div>
 
 <script>
 (function() {
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const captured = document.getElementById('captured');
-  const camOverlay = document.getElementById('cam-overlay');
-  const camCountdown = document.getElementById('cam-countdown');
-  const deviceSelect = document.getElementById('device-select');
-  const camPanel = document.getElementById('camera-panel');
-  const previewPanel = document.getElementById('preview-panel');
-  const scorePanel = document.getElementById('score-panel');
-  const loading = document.getElementById('loading');
+  const $ = id => document.getElementById(id);
+  const video = $('video'), canvas = $('canvas'), captured = $('captured');
+  const camOverlay = $('cam-overlay'), camCountdown = $('cam-countdown');
+  const deviceSelect = $('device-select');
+  const camPanel = $('camera-panel'), previewPanel = $('preview-panel');
+  const scorePanel = $('score-panel'), loading = $('loading');
+  const startBtn = $('start-cam'), captureNowBtn = $('capture-now'), capture3sBtn = $('capture-3s');
+  const retakeBtn = $('retake'), analyzeBtn = $('analyze'), cancelBtn = $('cancel');
+  const newBtn = $('new-capture'), exportBtn = $('export-hud');
+  const keyPanel = $('key-panel'), keySetup = $('key-setup'), keySaved = $('key-saved');
+  const keyInput = $('key-input'), keySave = $('key-save'), keyTest = $('key-test');
+  const keyMasked = $('key-masked'), keyChange = $('key-change'), keyTitle = $('key-title');
 
-  const startBtn = document.getElementById('start-cam');
-  const captureNowBtn = document.getElementById('capture-now');
-  const capture3sBtn = document.getElementById('capture-3s');
-  const retakeBtn = document.getElementById('retake');
-  const analyzeBtn = document.getElementById('analyze');
-  const cancelBtn = document.getElementById('cancel');
-  const newBtn = document.getElementById('new-capture');
-  const exportBtn = document.getElementById('export-hud');
+  let stream = null, selectedDeviceId = null;
+  let currentMode = 'FACE', currentImage = null, currentScores = null;
+  let apiKey = null;
 
-  let stream = null;
-  let selectedDeviceId = null;
-  let currentMode = 'FACE';
-  let currentImage = null;
-  let currentScores = null;
-
-  // Clock
   function updateClock() {
     const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
-    const timeStr = now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
-    document.getElementById('now-display').textContent = dateStr.toUpperCase() + ' · ' + timeStr;
+    const d = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    const t = now.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+    $('now-display').textContent = d.toUpperCase() + ' · ' + t;
   }
-  updateClock();
-  setInterval(updateClock, 30000);
+  updateClock(); setInterval(updateClock, 30000);
 
-  // Mode selection
+  function maskKey(k) { return (!k || k.length < 12) ? '****' : k.slice(0, 10) + '...' + k.slice(-4); }
+  function loadKey() {
+    apiKey = localStorage.getItem('sfx-api-key');
+    if (apiKey) {
+      keySetup.style.display = 'none';
+      keySaved.style.display = 'block';
+      keyPanel.classList.add('set');
+      keyTitle.textContent = '✓ API KEY ACTIVE';
+      keyTitle.style.color = 'var(--green)';
+      keyMasked.textContent = maskKey(apiKey);
+    } else {
+      keySetup.style.display = 'block';
+      keySaved.style.display = 'none';
+      keyPanel.classList.remove('set');
+      keyTitle.textContent = '⚠ API KEY REQUIRED';
+      keyTitle.style.color = 'var(--orange)';
+    }
+  }
+  keyInput.addEventListener('input', () => { keyTest.disabled = !keyInput.value.startsWith('sk-ant-'); });
+  keySave.addEventListener('click', () => {
+    const k = keyInput.value.trim();
+    if (!k.startsWith('sk-ant-')) { showError('Invalid key - should start with sk-ant-'); return; }
+    localStorage.setItem('sfx-api-key', k);
+    apiKey = k; keyInput.value = ''; loadKey();
+  });
+  keyChange.addEventListener('click', () => {
+    if (confirm('Remove saved API key?')) { localStorage.removeItem('sfx-api-key'); apiKey = null; loadKey(); }
+  });
+  keyTest.addEventListener('click', async () => {
+    const k = keyInput.value.trim();
+    if (!k.startsWith('sk-ant-')) { showError('Invalid key format'); return; }
+    keyTest.textContent = 'TESTING...'; keyTest.disabled = true;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': k, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 10, messages: [{ role: 'user', content: 'Say OK' }] })
+      });
+      if (res.ok) { alert('✓ Key works. Click SAVE KEY to persist.'); }
+      else { const t = await res.text(); showError('Key test failed: ' + res.status + ' ' + t.slice(0, 200)); }
+    } catch (err) { showError('Test error: ' + err.message); }
+    finally { keyTest.textContent = 'TEST KEY'; keyTest.disabled = false; }
+  });
+
   document.querySelectorAll('.mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -348,86 +336,55 @@
   });
 
   function updateHint() {
-    const hints = {
-      FACE: 'FACE MODE · EYE LEVEL · NATURAL LIGHT · NEUTRAL',
-      OUTFIT: 'OUTFIT MODE · FULL BODY · 6-8FT · MIRROR OR STAND',
-      PHYSIQUE: 'PHYSIQUE MODE · CONSISTENT ANGLE + LIGHTING',
-      DEPLOY: 'DEPLOY MODE · AS YOU LL WALK OUT · GO/CHANGE'
-    };
+    const hints = { FACE: 'FACE MODE · EYE LEVEL · NATURAL LIGHT · NEUTRAL', OUTFIT: 'OUTFIT MODE · FULL BODY · 6-8FT · MIRROR OR STAND', PHYSIQUE: 'PHYSIQUE MODE · CONSISTENT ANGLE + LIGHTING', DEPLOY: 'DEPLOY MODE · AS YOU LL WALK OUT · GO/CHANGE' };
     if (stream) camOverlay.textContent = hints[currentMode];
   }
 
-  // Enumerate devices (finds the Brio!)
   async function listCameras() {
     try {
-      // Need initial permission to see labels
       const tempStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       tempStream.getTracks().forEach(t => t.stop());
-
       const devices = await navigator.mediaDevices.enumerateDevices();
       const cams = devices.filter(d => d.kind === 'videoinput');
       deviceSelect.innerHTML = '';
       cams.forEach((cam, i) => {
         const label = cam.label || ('Camera ' + (i + 1));
         const opt = document.createElement('option');
-        opt.value = cam.deviceId;
-        opt.textContent = label;
-        // Auto-select Brio if found
+        opt.value = cam.deviceId; opt.textContent = label;
         if (label.toLowerCase().includes('brio')) opt.selected = true;
         deviceSelect.appendChild(opt);
       });
       selectedDeviceId = deviceSelect.value;
-    } catch (err) {
-      deviceSelect.innerHTML = '<option>Camera permission required</option>';
-      showError('Camera access error: ' + err.message);
-    }
+    } catch (err) { deviceSelect.innerHTML = '<option>Camera permission required</option>'; showError('Camera access error: ' + err.message); }
   }
-
-  deviceSelect.addEventListener('change', () => {
-    selectedDeviceId = deviceSelect.value;
-    if (stream) startCamera();
-  });
+  deviceSelect.addEventListener('change', () => { selectedDeviceId = deviceSelect.value; if (stream) startCamera(); });
 
   async function startCamera() {
     try {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      const constraints = {
-        video: selectedDeviceId
-          ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
-          : { width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false
-      };
+      const constraints = { video: selectedDeviceId ? { deviceId: { exact: selectedDeviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } } : { width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false };
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       video.srcObject = stream;
-      captureNowBtn.disabled = false;
-      capture3sBtn.disabled = false;
+      captureNowBtn.disabled = false; capture3sBtn.disabled = false;
       startBtn.textContent = 'STOP CAMERA';
       updateHint();
-    } catch (err) {
-      showError('Camera start failed: ' + err.message);
-    }
+    } catch (err) { showError('Camera start failed: ' + err.message); }
   }
-
   function stopCamera() {
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; video.srcObject = null; }
-    captureNowBtn.disabled = true;
-    capture3sBtn.disabled = true;
+    captureNowBtn.disabled = true; capture3sBtn.disabled = true;
     startBtn.textContent = 'START CAMERA';
     camOverlay.textContent = 'CAMERA STOPPED';
   }
-
-  startBtn.addEventListener('click', () => {
-    if (stream) stopCamera(); else startCamera();
-  });
+  startBtn.addEventListener('click', () => { if (stream) stopCamera(); else startCamera(); });
 
   function doCapture() {
     const vw = video.videoWidth, vh = video.videoHeight;
     if (!vw || !vh) { showError('Video not ready'); return; }
     canvas.width = vw; canvas.height = vh;
     canvas.getContext('2d').drawImage(video, 0, 0, vw, vh);
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
-    currentImage = dataUrl;
-    captured.src = dataUrl;
+    currentImage = canvas.toDataURL('image/jpeg', 0.88);
+    captured.src = currentImage;
     camPanel.style.display = 'none';
     previewPanel.style.display = 'block';
   }
@@ -435,43 +392,20 @@
   captureNowBtn.addEventListener('click', doCapture);
   capture3sBtn.addEventListener('click', () => {
     let count = 3;
-    camCountdown.classList.add('active');
-    camCountdown.textContent = count;
+    camCountdown.classList.add('active'); camCountdown.textContent = count;
     const tick = setInterval(() => {
       count--;
-      if (count <= 0) {
-        clearInterval(tick);
-        camCountdown.classList.remove('active');
-        doCapture();
-      } else {
-        camCountdown.textContent = count;
-      }
+      if (count <= 0) { clearInterval(tick); camCountdown.classList.remove('active'); doCapture(); }
+      else { camCountdown.textContent = count; }
     }, 1000);
   });
 
-  retakeBtn.addEventListener('click', () => {
-    previewPanel.style.display = 'none';
-    camPanel.style.display = 'block';
-  });
-  cancelBtn.addEventListener('click', () => {
-    previewPanel.style.display = 'none';
-    camPanel.style.display = 'block';
-    currentImage = null;
-  });
-  newBtn.addEventListener('click', () => {
-    scorePanel.style.display = 'none';
-    camPanel.style.display = 'block';
-    currentImage = null;
-    currentScores = null;
-  });
+  retakeBtn.addEventListener('click', () => { previewPanel.style.display = 'none'; camPanel.style.display = 'block'; clearPreviewError(); });
+  cancelBtn.addEventListener('click', () => { previewPanel.style.display = 'none'; camPanel.style.display = 'block'; currentImage = null; clearPreviewError(); });
+  newBtn.addEventListener('click', () => { scorePanel.style.display = 'none'; camPanel.style.display = 'block'; currentImage = null; currentScores = null; });
 
   function buildPrompt(mode) {
-    const notes = {
-      FACE: 'FACE mode: score FACE and EXPRESSION precisely. Style/silhouette from visible info.',
-      OUTFIT: 'OUTFIT mode: score STYLE and SILHOUETTE precisely. Face/expression from visible.',
-      PHYSIQUE: 'PHYSIQUE mode: shirtless/progress. Score SILHOUETTE precisely.',
-      DEPLOY: 'DEPLOY mode: full composite pre-event. Score EVERYTHING. Go/change decision.'
-    };
+    const notes = { FACE: 'FACE mode: score FACE and EXPRESSION precisely. Style/silhouette from visible info.', OUTFIT: 'OUTFIT mode: score STYLE and SILHOUETTE precisely. Face/expression from visible.', PHYSIQUE: 'PHYSIQUE mode: shirtless/progress. Score SILHOUETTE precisely.', DEPLOY: 'DEPLOY mode: full composite pre-event. Score EVERYTHING. Go/change decision.' };
     return `You are scoring Cassian (62, Seattle, silver fox INTJ) on P1 SEXY — attractiveness to the average female demographic.
 
 Photo-verified baseline (Feb 26, 2026): 6.83/10. Subscores: Style 5.0→6.5 (building), Expression 6.5→6.8 (building), Midsection 5.0-5.5 (FLOOR — biggest lever).
@@ -494,29 +428,29 @@ Return JSON ONLY, no markdown fence:
 
   analyzeBtn.addEventListener('click', async () => {
     if (!currentImage) return;
+    if (!apiKey) { showPreviewError('API key required. Save one in the top panel first.'); keyPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     previewPanel.style.display = 'none';
     loading.classList.add('show');
     stopCamera();
+    clearPreviewError();
 
     try {
       const base64Data = currentImage.split(',')[1];
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1200,
+          model: 'claude-sonnet-4-20250514', max_tokens: 1200,
           messages: [{
-            role: "user",
+            role: 'user',
             content: [
-              { type: "image", source: { type: "base64", media_type: "image/jpeg", data: base64Data } },
-              { type: "text", text: buildPrompt(currentMode) }
+              { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64Data } },
+              { type: 'text', text: buildPrompt(currentMode) }
             ]
           }]
         })
       });
-
-      if (!res.ok) { const t = await res.text(); throw new Error('API ' + res.status + ': ' + t.slice(0, 200)); }
+      if (!res.ok) { const t = await res.text(); throw new Error('API ' + res.status + ': ' + t.slice(0, 300)); }
       const data = await res.json();
       const txt = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
       let clean = txt.trim().replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
@@ -528,8 +462,9 @@ Return JSON ONLY, no markdown fence:
       saveHistory(scores, currentMode);
       renderHistory();
     } catch (err) {
-      showError('Analysis failed: ' + err.message);
+      loading.classList.remove('show');
       previewPanel.style.display = 'block';
+      showPreviewError('Analysis failed: ' + err.message);
     } finally {
       loading.classList.remove('show');
     }
@@ -544,115 +479,74 @@ Return JSON ONLY, no markdown fence:
   }
 
   function renderScores(s) {
-    const grid = document.getElementById('score-grid');
-    const dims = [
-      { k: 'face', l: 'FACE' }, { k: 'expression', l: 'EXPR' },
-      { k: 'style', l: 'STYLE' }, { k: 'silhouette', l: 'SILHT' }
-    ];
-    grid.innerHTML = dims.map(d => {
-      return `<div class="score-card"><div class="lab">${d.l}</div><div class="val" style="color:${sColor(s[d.k])}">${s[d.k].toFixed(1)}</div></div>`;
-    }).join('');
-
-    const cs = document.getElementById('composite-score');
+    const grid = $('score-grid');
+    const dims = [{ k: 'face', l: 'FACE' }, { k: 'expression', l: 'EXPR' }, { k: 'style', l: 'STYLE' }, { k: 'silhouette', l: 'SILHT' }];
+    grid.innerHTML = dims.map(d => `<div class="score-card"><div class="lab">${d.l}</div><div class="val" style="color:${sColor(s[d.k])}">${s[d.k].toFixed(1)}</div></div>`).join('');
+    const cs = $('composite-score');
     cs.textContent = s.composite.toFixed(2);
     cs.style.color = sColor(s.composite);
     const delta = s.composite - 6.83;
     const deltaStr = (delta >= 0 ? '+' : '') + delta.toFixed(2);
     const dColor = delta >= 0.1 ? '#1D9E75' : delta <= -0.1 ? '#E24B4A' : '#666';
-    document.getElementById('composite-vs').innerHTML = `vs baseline 6.83 · <span style="color:${dColor};font-weight:900">${deltaStr}</span>`;
-
-    document.getElementById('wins-list').innerHTML = (s.wins || []).map(w => `<div class="item">· ${esc(w)}</div>`).join('');
-    document.getElementById('fixes-list').innerHTML = (s.fixes || []).map(f => `<div class="item">· ${esc(f)}</div>`).join('');
-    document.getElementById('rationale').textContent = s.rationale || '';
-
+    $('composite-vs').innerHTML = `vs baseline 6.83 · <span style="color:${dColor};font-weight:900">${deltaStr}</span>`;
+    $('wins-list').innerHTML = (s.wins || []).map(w => `<div class="item">· ${esc(w)}</div>`).join('');
+    $('fixes-list').innerHTML = (s.fixes || []).map(f => `<div class="item">· ${esc(f)}</div>`).join('');
+    $('rationale').textContent = s.rationale || '';
     scorePanel.style.display = 'block';
     scorePanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
   function esc(s) { return String(s).replace(/[&<>"']/g, m => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
   function saveHistory(scores, mode) {
     try {
       const key = 'sfx-sexy-log';
       let items = JSON.parse(localStorage.getItem(key) || '[]');
-      items.unshift({
-        ts: new Date().toISOString(), mode: mode,
-        face: scores.face, expression: scores.expression,
-        style: scores.style, silhouette: scores.silhouette,
-        composite: scores.composite,
-        wins: scores.wins || [], fixes: scores.fixes || [], rationale: scores.rationale || ''
-      });
+      items.unshift({ ts: new Date().toISOString(), mode: mode, face: scores.face, expression: scores.expression, style: scores.style, silhouette: scores.silhouette, composite: scores.composite, wins: scores.wins || [], fixes: scores.fixes || [], rationale: scores.rationale || '' });
       items = items.slice(0, 100);
       localStorage.setItem(key, JSON.stringify(items));
     } catch(e) { console.error(e); }
   }
 
   function renderHistory() {
-    const div = document.getElementById('history');
+    const div = $('history');
     let items = [];
     try { items = JSON.parse(localStorage.getItem('sfx-sexy-log') || '[]'); } catch(e) {}
-
-    document.getElementById('stat-total').textContent = items.length;
+    $('stat-total').textContent = items.length;
     if (items.length > 0) {
       const best = items.reduce((b, c) => c.composite > b.composite ? c : b, items[0]);
-      document.getElementById('stat-best').textContent = best.composite.toFixed(2);
-      document.getElementById('stat-best').style.color = sColor(best.composite);
+      $('stat-best').textContent = best.composite.toFixed(2);
+      $('stat-best').style.color = sColor(best.composite);
       const cutoff = Date.now() - 7*24*60*60*1000;
       const last7 = items.filter(i => new Date(i.ts).getTime() > cutoff);
-      if (last7.length > 0) {
-        const avg = last7.reduce((s, c) => s + c.composite, 0) / last7.length;
-        document.getElementById('stat-avg').textContent = avg.toFixed(2);
-        document.getElementById('stat-avg').style.color = sColor(avg);
-      }
+      if (last7.length > 0) { const avg = last7.reduce((s, c) => s + c.composite, 0) / last7.length; $('stat-avg').textContent = avg.toFixed(2); $('stat-avg').style.color = sColor(avg); }
     }
-
     if (!items.length) { div.innerHTML = '<div class="empty">No captures yet.</div>'; return; }
-
     div.innerHTML = items.slice(0, 25).map(it => {
       const d = new Date(it.ts);
       const dateStr = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
       const timeStr = d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
-      return `<div class="hist-item">
-        <div class="date">${dateStr}<br>${timeStr}</div>
-        <div class="mode">${it.mode}</div>
-        <div class="sc">F${it.face.toFixed(1)} E${it.expression.toFixed(1)} St${it.style.toFixed(1)} Si${it.silhouette.toFixed(1)}</div>
-        <div class="cmp" style="color:${sColor(it.composite)}">${it.composite.toFixed(2)}</div>
-      </div>`;
+      return `<div class="hist-item"><div class="date">${dateStr}<br>${timeStr}</div><div class="mode">${it.mode}</div><div class="sc">F${it.face.toFixed(1)} E${it.expression.toFixed(1)} St${it.style.toFixed(1)} Si${it.silhouette.toFixed(1)}</div><div class="cmp" style="color:${sColor(it.composite)}">${it.composite.toFixed(2)}</div></div>`;
     }).join('');
   }
 
-  // Export to HUD
   exportBtn.addEventListener('click', () => {
     try {
       const items = JSON.parse(localStorage.getItem('sfx-sexy-log') || '[]');
       const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sexy-captures-' + new Date().toISOString().slice(0,10) + '.json';
-      a.click();
+      const a = document.createElement('a'); a.href = url; a.download = 'sexy-captures-' + new Date().toISOString().slice(0,10) + '.json'; a.click();
       URL.revokeObjectURL(url);
     } catch(e) { showError('Export failed: ' + e.message); }
   });
 
-  function showError(msg) {
-    let box = document.querySelector('.error-box');
-    if (!box) {
-      box = document.createElement('div');
-      box.className = 'error-box';
-      camPanel.insertBefore(box, camPanel.firstChild.nextSibling);
-    }
-    box.textContent = msg;
-    setTimeout(() => { if (box.parentNode) box.parentNode.removeChild(box); }, 5000);
-  }
+  function showError(msg) { const slot = $('error-slot'); slot.innerHTML = '<div class="error-box">' + esc(msg) + '</div>'; setTimeout(() => { slot.innerHTML = ''; }, 8000); }
+  function showPreviewError(msg) { $('preview-error-slot').innerHTML = '<div class="error-box">' + esc(msg) + '</div>'; }
+  function clearPreviewError() { $('preview-error-slot').innerHTML = ''; }
 
-  // Init
+  loadKey();
   renderHistory();
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    listCameras();
-  } else {
-    showError('Camera API not available. Use Chrome/Edge/Safari on https or localhost.');
-  }
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) { listCameras(); }
+  else { showError('Camera API not available. Use Chrome/Edge/Safari on https or localhost.'); }
 })();
 </script>
 </body>
