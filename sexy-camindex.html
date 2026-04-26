@@ -45,6 +45,7 @@
 
   .controls { display: grid; gap: 8px; grid-template-columns: 1fr 1fr 1fr; }
   .controls.two { grid-template-columns: 1fr 1fr; }
+  .controls.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
   .btn { background: var(--surface-2); border: 1px solid var(--border-bright); color: var(--text); font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 11px 8px; cursor: pointer; letter-spacing: 1.5px; border-radius: 3px; }
   .btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
@@ -53,6 +54,8 @@
   .btn-primary:hover:not(:disabled) { background: #e5c048; border-color: #e5c048; }
   .btn-success { background: var(--green); color: #fff; border-color: var(--green); }
   .btn-success:hover:not(:disabled) { background: #25b689; color: #fff; }
+  .btn-claude { background: #6b4ab8; color: #fff; border-color: #A78BFA; }
+  .btn-claude:hover:not(:disabled) { background: #7d56cc; border-color: #A78BFA; color: #fff; }
   .btn-danger { background: transparent; border-color: var(--red); color: var(--red); }
 
   .composite-row { background: linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.02)); border: 1px solid var(--gold-dim); padding: 14px; border-radius: 4px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
@@ -111,14 +114,21 @@
   details { margin-top: 8px; }
   details summary { cursor: pointer; color: var(--muted-2); font-size: 10px; letter-spacing: 1px; padding: 4px 0; }
   details summary:hover { color: var(--gold); }
+
+  .toast { position: fixed; top: 20px; right: 20px; background: var(--green); color: #fff; padding: 14px 20px; border-radius: 4px; font-size: 12px; font-weight: 700; letter-spacing: 1px; opacity: 0; transform: translateY(-10px); transition: all 0.25s; pointer-events: none; z-index: 1000; box-shadow: 0 6px 20px rgba(0,0,0,0.5); max-width: 360px; line-height: 1.5; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: var(--red); }
+  .toast.purple { background: #6b4ab8; border: 1px solid #A78BFA; }
+  .toast .small { font-size: 10px; opacity: 0.85; margin-top: 4px; font-weight: 500; }
 </style>
 </head>
 <body>
+<div id="toast" class="toast"></div>
 <div class="app">
   <header class="top">
     <div>
       <div class="title">📸 SEXY SCORE · DESKTOP</div>
-      <div class="sub">LOGITECH BRIO READY · BASELINE 6.83 · BRUTAL MODE</div>
+      <div class="sub">BRIO · SAVE IMAGE FOR CLAUDE · OR ANALYZE INLINE</div>
     </div>
     <div style="text-align:right">
       <div class="sub" id="now-display"></div>
@@ -127,26 +137,13 @@
   </header>
 
   <div class="key-panel" id="key-panel">
-    <div class="panel-title" id="key-title">⚠ API KEY REQUIRED</div>
+    <div class="panel-title" id="key-title">⚠ API KEY (optional — only for inline ANALYZE)</div>
     <div id="key-setup">
-      <input type="password" class="key-input" id="key-input" placeholder="Paste your Anthropic API key here (sk-ant-...)" autocomplete="off">
+      <input type="password" class="key-input" id="key-input" placeholder="sk-ant-... (leave empty if using Claude chat for scoring)" autocomplete="off">
       <div class="controls two">
         <button class="btn btn-primary" id="key-save">SAVE KEY</button>
         <button class="btn" id="key-test" disabled>TEST KEY</button>
       </div>
-      <details>
-        <summary>▸ HOW TO GET AN API KEY (2 MIN, ONE-TIME)</summary>
-        <div class="key-help">
-          1. Go to <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> and sign in<br>
-          2. Click <b style="color:var(--gold)">Settings</b> → <b style="color:var(--gold)">API Keys</b><br>
-          3. Click <b style="color:var(--gold)">Create Key</b> — name it "sexy-cam"<br>
-          4. Copy the key (starts with <code>sk-ant-</code>)<br>
-          5. Paste above, click SAVE KEY<br>
-          6. Add ~$5-10 of credits at Settings → Billing (covers months)<br>
-          <br>
-          <b style="color:var(--gold)">Privacy:</b> Key stored only in your browser's localStorage. Sent only to Anthropic's API. This page lives on your GitHub — no third-party server.
-        </div>
-      </details>
     </div>
     <div id="key-saved" style="display:none">
       <div class="key-status ok">
@@ -189,9 +186,10 @@
         <div class="camera-wrap">
           <img id="captured" class="captured-img" alt="captured">
         </div>
-        <div class="controls" style="margin-top:10px">
+        <div class="controls four" style="margin-top:10px">
           <button class="btn btn-danger" id="retake">RETAKE</button>
-          <button class="btn btn-success" id="analyze">ANALYZE</button>
+          <button class="btn btn-claude" id="save-image">SAVE FOR CLAUDE</button>
+          <button class="btn btn-success" id="analyze">ANALYZE (API)</button>
           <button class="btn" id="cancel">CANCEL</button>
         </div>
       </div>
@@ -218,7 +216,7 @@
           <div class="rationale" id="rationale"></div>
           <div class="controls two">
             <button class="btn" id="new-capture">NEW CAPTURE</button>
-            <button class="btn btn-primary" id="export-hud">EXPORT TO HUD</button>
+            <button class="btn btn-primary" id="export-hud">EXPORT HISTORY JSON</button>
           </div>
         </div>
       </div>
@@ -226,6 +224,22 @@
 
     <div>
       <div class="panel">
+        <div class="panel-title">WORKFLOW</div>
+        <div style="font-size:10px; color:var(--muted-2); line-height:1.8">
+          <div style="color:#A78BFA; font-weight:700; margin-bottom:4px">🟣 RECOMMENDED — CLAUDE SCORING</div>
+          1. Capture → Review<br>
+          2. Click <b style="color:#A78BFA">SAVE FOR CLAUDE</b><br>
+          3. Image downloads · prompt copied<br>
+          4. Switch to Claude tab · paste · drag image · send<br>
+          5. Claude scores with full context<br>
+          <br>
+          <div style="color:var(--green); font-weight:700; margin-bottom:4px">🟢 BACKUP — INLINE API</div>
+          Click <b style="color:var(--green)">ANALYZE</b> for standalone Sonnet score<br>
+          (requires API key, ~$0.01/capture)
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
         <div class="panel-title">STATS</div>
         <div class="stat-strip">
           <div class="s"><div class="v" id="stat-total">0</div><div class="l">TOTAL</div></div>
@@ -241,18 +255,18 @@
       <div class="panel" style="margin-top:12px">
         <div class="panel-title">TIPS FOR BRIO</div>
         <div style="font-size:10px; color:var(--muted-2); line-height:1.6">
-          · Position cam at <b style="color:var(--gold)">eye level</b>, not below (double-chin angle)<br>
-          · <b style="color:var(--gold)">Natural window light</b> front-facing &gt; overhead artificial<br>
-          · For OUTFIT: back up 6-8ft, stand, full body visible<br>
-          · For PHYSIQUE: consistent lighting + same spot each time<br>
-          · Brio auto-adjusts - let it settle 3s before capture<br>
-          · Use "CAPTURE IN 3s" to nail the right expression
+          · Cam at <b style="color:var(--gold)">eye level</b>, not below<br>
+          · <b style="color:var(--gold)">Natural window light</b> front-facing<br>
+          · OUTFIT: back up 6-8ft, full body visible<br>
+          · PHYSIQUE: same spot + lighting each time<br>
+          · Let Brio settle 3s before capture<br>
+          · Use CAPTURE IN 3s for right expression
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">SEXY_SCORE DESKTOP v1.2 · SONNET 4.6 · OPERATION SILVER FOX</div>
+  <div class="footer">SEXY_SCORE DESKTOP v1.5 · TARGET DEMO CORRECTED · OPERATION SILVER FOX</div>
 </div>
 
 <script>
@@ -264,11 +278,12 @@
   const camPanel = $('camera-panel'), previewPanel = $('preview-panel');
   const scorePanel = $('score-panel'), loading = $('loading');
   const startBtn = $('start-cam'), captureNowBtn = $('capture-now'), capture3sBtn = $('capture-3s');
-  const retakeBtn = $('retake'), analyzeBtn = $('analyze'), cancelBtn = $('cancel');
+  const retakeBtn = $('retake'), saveImageBtn = $('save-image'), analyzeBtn = $('analyze'), cancelBtn = $('cancel');
   const newBtn = $('new-capture'), exportBtn = $('export-hud');
   const keyPanel = $('key-panel'), keySetup = $('key-setup'), keySaved = $('key-saved');
   const keyInput = $('key-input'), keySave = $('key-save'), keyTest = $('key-test');
   const keyMasked = $('key-masked'), keyChange = $('key-change'), keyTitle = $('key-title');
+  const toast = $('toast');
 
   let stream = null, selectedDeviceId = null;
   let currentMode = 'FACE', currentImage = null, currentScores = null;
@@ -282,6 +297,13 @@
   }
   updateClock(); setInterval(updateClock, 30000);
 
+  function showToast(msg, type) {
+    toast.className = 'toast' + (type ? ' ' + type : '');
+    toast.innerHTML = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4500);
+  }
+
   function maskKey(k) { return (!k || k.length < 12) ? '****' : k.slice(0, 10) + '...' + k.slice(-4); }
   function loadKey() {
     apiKey = localStorage.getItem('sfx-api-key');
@@ -289,14 +311,14 @@
       keySetup.style.display = 'none';
       keySaved.style.display = 'block';
       keyPanel.classList.add('set');
-      keyTitle.textContent = '✓ API KEY ACTIVE';
+      keyTitle.textContent = '✓ API KEY SET (inline ANALYZE available)';
       keyTitle.style.color = 'var(--green)';
       keyMasked.textContent = maskKey(apiKey);
     } else {
       keySetup.style.display = 'block';
       keySaved.style.display = 'none';
       keyPanel.classList.remove('set');
-      keyTitle.textContent = '⚠ API KEY REQUIRED';
+      keyTitle.textContent = '⚠ API KEY (optional — only for inline ANALYZE)';
       keyTitle.style.color = 'var(--orange)';
     }
   }
@@ -404,31 +426,96 @@
   cancelBtn.addEventListener('click', () => { previewPanel.style.display = 'none'; camPanel.style.display = 'block'; currentImage = null; clearPreviewError(); });
   newBtn.addEventListener('click', () => { scorePanel.style.display = 'none'; camPanel.style.display = 'block'; currentImage = null; currentScores = null; });
 
+  // ── SAVE FOR CLAUDE — the main new feature ──
+  saveImageBtn.addEventListener('click', async () => {
+    if (!currentImage) { showError('No image captured'); return; }
+    try {
+      // 1. Download the JPG
+      const now = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      const stamp = now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '-' + pad(now.getHours()) + pad(now.getMinutes());
+      const filename = `sexy-${stamp}-${currentMode}.jpg`;
+      const a = document.createElement('a');
+      a.href = currentImage;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // 2. Copy preamble to clipboard
+      const timeStr = now.toLocaleString('en-US', { weekday:'short', month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+      const preamble = `SEXY SCORE · ${timeStr} · ${currentMode} MODE\n\nScore me against 6.83 baseline with full context (sleep, food, training, deploy schedule). Brutal, calibrated, no flattery. Return [SEXY_SCORE_LOG] JSON block at end for HUD import.`;
+      
+      await navigator.clipboard.writeText(preamble);
+
+      // 3. Toast confirmation
+      showToast(
+        `✓ SAVED · Image: ${filename}<div class="small">Preamble copied to clipboard. Paste + drag image into Claude chat.</div>`,
+        'purple'
+      );
+
+      // 4. Return to camera state
+      previewPanel.style.display = 'none';
+      camPanel.style.display = 'block';
+    } catch (err) {
+      // Clipboard might fail on some browsers; image still downloaded
+      showToast(`Image downloaded · Clipboard failed: ${err.message}`, 'err');
+    }
+  });
+
   function buildPrompt(mode) {
-    const notes = { FACE: 'FACE mode: score FACE and EXPRESSION precisely. Style/silhouette from visible info.', OUTFIT: 'OUTFIT mode: score STYLE and SILHOUETTE precisely. Face/expression from visible.', PHYSIQUE: 'PHYSIQUE mode: shirtless/progress. Score SILHOUETTE precisely.', DEPLOY: 'DEPLOY mode: full composite pre-event. Score EVERYTHING. Go/change decision.' };
-    return `You are scoring Cassian (62, Seattle, silver fox INTJ) on P1 SEXY — attractiveness to the average female demographic.
+    const notes = {
+      FACE: 'FACE mode: score FACE and EXPRESSION precisely. Style/silhouette estimated from visible frame.',
+      OUTFIT: 'OUTFIT mode: score STYLE and SILHOUETTE precisely. Face/expression estimated from visible frame.',
+      PHYSIQUE: 'PHYSIQUE mode: shirtless/progress check. Score SILHOUETTE precisely.',
+      DEPLOY: 'DEPLOY mode: full composite pre-event. Score everything. Go/change decision.'
+    };
+    return `You are scoring Cassian (62, Pacific NW) on P1 SEXY — attractiveness to his actual target demographic.
 
-Photo-verified baseline (Feb 26, 2026): 6.83/10. Subscores: Style 5.0→6.5 (building), Expression 6.5→6.8 (building), Midsection 5.0-5.5 (FLOOR — biggest lever).
+TARGET DEMOGRAPHIC (strict — this is NOT generic American):
+Women ages 40-65 in Filipino, South Asian, African, and Southeast Asian communities. Specifically: Kapampangan/Tagalog Filipino family and social network, Punjabi and broader South Asian professional peers (healthcare workplace), ambient encounters in diverse hospital and church settings. His wife is Kapampangan Filipino; her sisters and extended network are primary social-proof nodes.
 
-He UNDERESTIMATES. Do NOT flatter. Accurate AND brutal. Real numbers. No hedging.
+These demographics value:
+- Grooming, cleanliness, and "put-together" presentation over rugged masculinity
+- Health and vitality markers (clear skin, bright eyes, energy)
+- Respectability and social calibration (not "alpha" signaling)
+- Warmth and approachability (not stoic/aloof)
+- Silver hair is VALUED as status and maturity, not penalized as aging
+- Modesty in style — not loud, not trendy, not fashion-forward
+- Evidence of care (trimmed, clean clothes, neat grooming) over expensive gear
+
+NOT TARGET — do NOT score against:
+- Young American/Western women (20s-30s)
+- GQ / fashion-editor aesthetics
+- Instagram / influencer standards
+- "Masculine alpha" archetypes
+- Gym-bro / bodybuilder body standards
+
+Baseline: 6.83 (good-day photograph). Brutal but fair. Do NOT flatter. Do NOT penalize webcam artifacts — compensate for low angle, flat lighting, or minor puffiness that wouldn't exist in person. Judge the man, not the capture conditions.
 
 MODE: ${mode}
 ${notes[mode]}
 
-DIMENSIONS (0-10, half-points OK):
-- FACE: skin, symmetry, puffiness, silver-hair contrast, angle
-- EXPRESSION: warmth, confidence, approachability, eye engagement
-- STYLE: fit, color harmony, silver-fox coherence
-- SILHOUETTE: V-taper, midsection, posture, frame
-- COMPOSITE: overall demographic hit rate
+SCORE (0-10, half-points OK):
+- FACE: skin quality, symmetry, jaw, eye area. Compensate for webcam distortion.
+- EXPRESSION: warmth and approachability. NOT "confidence" — warmth.
+- STYLE: fit and color of garments on his body. Modesty and care signals. Just the clothes.
+- SILHOUETTE: posture, shoulder line, midsection as visible. Health markers.
+- COMPOSITE: would his target demographic (above) look twice and register him as attractive?
+
+DO NOT:
+- Comment on background, room, or setting
+- Infer personality, intellect, profession, or "vibe"
+- Use words like "distinguished," "GQ," "sophisticated," "alpha," "silver-fox coherence"
+- Score against Western/young/fashion-forward standards
 
 Return JSON ONLY, no markdown fence:
-{"face":6.5,"expression":6.8,"style":5.5,"silhouette":5.0,"composite":6.4,"wins":["specific 1","specific 2"],"fixes":["ranked fix 1","ranked fix 2"],"rationale":"One paragraph: state vs baseline 6.83, highest-ROI lever now."}`;
+{"face":6.5,"expression":6.8,"style":5.5,"silhouette":5.0,"composite":6.4,"wins":["concrete physical observation 1","concrete physical observation 2"],"fixes":["actionable physical change 1 (ranked by ROI)","actionable physical change 2"],"rationale":"One short paragraph. Physical only. Framed through the actual target demographic, not generic standards."}`;
   }
 
   analyzeBtn.addEventListener('click', async () => {
     if (!currentImage) return;
-    if (!apiKey) { showPreviewError('API key required. Save one in the top panel first.'); keyPanel.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (!apiKey) { showPreviewError('API key required for inline ANALYZE. Use SAVE FOR CLAUDE instead, or set API key above.'); return; }
     previewPanel.style.display = 'none';
     loading.classList.add('show');
     stopCamera();
